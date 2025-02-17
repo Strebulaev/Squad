@@ -1,0 +1,12 @@
+<div>
+  <h1 class="countdown-header">До 17 марта 23:00 осталось:</h1>
+  <div class="countdown-container">
+    <span class="countdown-value" [@countdownAnimation]="'zoom'" [innerHTML]="days"></span> дней
+    <span class="countdown-value" [@countdownAnimation]="'zoom'" [innerHTML]="hours"></span> часов
+    <span class="countdown-value" [@countdownAnimation]="'zoom'" [innerHTML]="minutes"></span> минут
+    <span class="countdown-value" [@countdownAnimation]="'zoom'" [innerHTML]="seconds"></span> секунд
+  </div>
+  <div class="countdown-finished" *ngIf="countdownFinished">
+    <h2 class="countdown-finished-text">Опять проиграли?!?!??!? Заебали, уроды</h2>
+  </div>
+</div>

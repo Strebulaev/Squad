@@ -1,0 +1,37 @@
+<div class="lighting"></div>
+
+<div class="chandelier chandelier-left"></div>
+<div class="chandelier chandelier-right"></div>
+
+<div class="pumpkin"></div>
+
+<div class="spider-web web-top-left"></div>
+<div class="spider-web web-bottom-left"></div>
+<div class="spider-web web-bottom-right"></div>
+<div class="spider-web web-bottom-right1"></div>
+<div class="spider-web web-bottom-right2"></div>
+
+<div class="container">
+  <h1 class="title">
+    <img src="/assets/images/DnD.png" alt="Картинка DnD">
+    <span class="colortext">hub</span>
+  </h1>
+  <div class="chess-board">
+    <div class="chess-cell"
+         *ngFor="let cell of chessBoard"
+         [class.selected]="cell === selectedCell"
+         [style.background-color]="cell.color"
+         (click)="selectCell(cell)"
+         [class.draggable]="cell.piece !== ''"
+         [attr.draggable]="cell.piece !== '' ? 'true' : null">
+      <div class="chess-cell-inner" [ngClass]="getChessPieceClass(cell)">
+        <span>{{ cell.piece }}</span>
+      </div>
+    </div>
+ </div>
+
+
+    <div class="pointRight"></div>
+    <div class="pointLeft"></div>
+    <div class="pointPumpkin"></div>
+  </div>

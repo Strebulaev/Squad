@@ -1,0 +1,36 @@
+<div class="gallery">
+  <h1 class="gallery-heading">Галерея</h1>
+  <nav>
+    <ul class="tabs tabs-scrollable">
+      <li [class.selected]="selectedTab === 1" (click)="changeTab(1)">Персонажи</li>
+      <li [class.selected]="selectedTab === 2" (click)="changeTab(2)">Фанарты</li>
+    </ul>
+  </nav>
+  <div class="line-wrapper">
+    <div class="line"></div>
+    <div class="line-middle"></div>
+    <div class="line"></div>
+  </div>
+
+  <div class="tab-content" [hidden]="selectedTab !== 1">
+    <!-- Контент для вкладки "Персонажи" -->
+    <h2 class="tab-text"></h2>
+    <div class="image-row">
+      <div class="image-col" *ngFor="let character of characters">
+        <img [src]="character.imageUrl" alt="{{ character.name }}" />
+        <p class="image-name">{{ character.name }}</p> <!-- Название картинки -->
+      </div>
+    </div>
+  </div>
+
+  <div class="tab-content" [hidden]="selectedTab !== 2">
+    <!-- Контент для вкладки "Фанарты" -->
+    <h2 class="tab-text"></h2>
+    <div class="image-row">
+      <div class="image-col" *ngFor="let fanart of fanarts">
+        <img [src]="fanart.imageUrl" alt="{{ fanart.title }}" />
+        <p class="image-name">{{ fanart.title }}</p> <!-- Название картинки -->
+      </div>
+    </div>
+  </div>
+</div>

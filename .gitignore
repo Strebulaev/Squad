@@ -1,0 +1,4 @@
+# Игнорировать папку .vs
+.vs/
+# Игнорировать папку node_modules (если это Angular/Node.js проект)
+node_modules/

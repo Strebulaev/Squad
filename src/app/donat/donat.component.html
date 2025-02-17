@@ -1,0 +1,16 @@
+<h1>Сквадер(уже меньше фальшифка)</h1>
+
+<div>
+  <button class="toggle-comments" (click)="toggleComments()">☬</button>
+  <ul [ngClass]="{'comments': true, 'show': showComments}">
+    <li *ngFor="let comment of comments; let i = index">
+      <strong>{{ comment.author }}</strong>: {{ comment.body }} <button (click)="deleteComment(i)">Удалить</button>
+    </li>
+  </ul>
+
+  <div>
+    <input type="text" [(ngModel)]="newComment.author" placeholder="Имя">
+    <textarea [(ngModel)]="newComment.body" placeholder="Комментарий"></textarea>
+    <button (click)="addComment()">Отправить</button>
+  </div>
+</div>

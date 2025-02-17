@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Squader Chat</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      height: 80vh; /* Высота 100% от видимой области */
+      display: flex;
+      flex-direction: column; /* Вертикальное расположение элементов */
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    #messages {
+      list-style-type: none;
+      padding: 0;
+      max-width: 600px; /* Максимальная ширина сообщений */
+      margin: 20px auto; /* Центрируем список сообщений */
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      flex-grow: 1; /* Позволяет списку занимать всё доступное пространство */
+      overflow-y: auto; /* Добавление прокрутки, если сообщений слишком много */
+    }
+
+      #messages li {
+        padding: 10px;
+        border-bottom: 1px solid #eee; /* Разделение сообщений */
+        text-align: left; /* Выравнивание текста сообщений влево */
+      }
+
+        #messages li:last-child {
+          border-bottom: none;
+        }
+
+    form {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background-color: #fff;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #nameInput, #messageInput {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      outline: none;
+      transition: border 0.3s;
+      margin-right: 10px;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: #5b9bd5;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+      button:hover {
+        background-color: #3a8bb5;
+      }
+  </style>
+  <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+  <h1>Сквадерок</h1>
+  <ul id="messages"></ul>
+  <app-reviews [tab]="'Чат'"></app-reviews>
+
+  <script>
+    const socket = io();
+
+    function sendMessage(event) {
+      event.preventDefault(); // Предотвращаем перезагрузку страницы
+      const name = document.getElementById('nameInput').value;
+      const msg = document.getElementById('messageInput').value;
+
+      if (name && msg) {
+        const messageData = { name: name, message: msg };
+        socket.emit('chat message', messageData);
+        document.getElementById('messageInput').value = ''; // Очищаем поле ввода
+      }
+      return false;
+    }
+
+    socket.on('chat message', function (data) {
+      const item = document.createElement('li');
+      item.textContent = `${data.name}: ${data.message}`; // Используйте обратные кавычки для интерполяции
+      document.getElementById('messages').appendChild(item);
+
+      const messagesContainer = document.getElementById('messages');
+      messagesContainer.scrollTop = messagesContainer.scrollHeight; // Прокрутка вниз
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+h1 {
+  font-size: 3rem;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.countdown-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.countdown-finished {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  word-wrap: break-word; /* Добавленное свойство */
+}
+
+.countdown-finished-text {
+  font-size: 48px;
+}
+
+
+.countdown-value {
+  font-size: 5rem;
+  margin: 1rem;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease-in-out;
+}
+
+  .countdown-value:hover {
+    transform: scale(1.2);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    background-color: #ff6f00;
+  }
+
+@media screen and (max-width: 768px) {
+  .countdown-container {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .countdown-value {
+    font-size: 3rem;
+  }
+}

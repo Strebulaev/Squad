@@ -1,0 +1,19 @@
+h1 {
+  font-size: 47px;
+  font-family: "Roboto", sans-serif;
+}
+
+h2 {
+  font-size: 23px;
+  font-family: "Roboto", sans-serif;
+}
+
+.lore {
+  font-size: 15px;
+  font-family: "Verdana", sans-serif;
+  white-space: pre-wrap;
+  white-space: -moz-pre-wrap;
+  white-space: -pre-wrap;
+  white-space: -o-pre-wrap;
+  word-wrap: break-word;
+}

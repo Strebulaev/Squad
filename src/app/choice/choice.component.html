@@ -1,0 +1,15 @@
+<div class="candidates-container">
+  <div class="bars-container">
+    <div class="candidate" *ngFor="let candidate of candidates">
+      <div class="percentage-container">
+        <div class="empty-bar"></div>
+        <div class="filled-bar" [style.height]="'calc(' + candidate.percentage + '%)'"></div>
+      </div>
+      <div class="name">{{ candidate.name }}</div>
+      <button class="vote-button" (click)="vote(candidate)">
+        Проголосовать за {{ candidate.name }}
+      </button>
+      <div class="percentage">{{ roundPercentage(candidate.percentage) }}%</div>
+    </div>
+  </div>
+</div>

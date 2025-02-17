@@ -1,0 +1,108 @@
+<div class="tabs">
+  <button (click)="selectTab('fantasy')" [class.active]="activeTab === 'fantasy'">Фантастика</button>
+  <button (click)="selectTab('detective')" [class.active]="activeTab === 'detective'">Детектив</button>
+  <button (click)="selectTab('sci-fi')" [class.active]="activeTab === 'sci-fi'">Научная фантастика</button>
+  <button (click)="selectTab('Horror')" [class.active]="activeTab === 'Horror'">Хоррор</button>
+  <button (click)="selectTab('Novel')" [class.active]="activeTab === 'Novel'">Роман</button>
+  <button (click)="selectTab('History')" [class.active]="activeTab === 'History'">История</button>
+  <button (click)="selectTab('UnpublishedBooks')" [class.active]="activeTab === 'UnpublishedBooks'">Не вышедшие книги</button>
+</div>
+
+<div class="tab-content">
+  <div *ngIf="activeTab === 'fantasy'">
+    <h2>Фантастика</h2>
+    <pre>
+
+<b>Дж.Р.Р. Толкиен</b>
+Хоббит: Туда и обратно
+Властелин Колец: хранители кольца
+Властелин Колец: Две твердыни
+Властелин Колец: Возвращение короля
+Сильмариллион
+Неоконченные предания Нуменора и Средиземья
+Дети Хурина
+Берен и Лутиэн
+Падение Гондолина
+Песни Белерианда
+Устроение Средиземья
+
+<b>Роджер Желязны</b>
+Князь света
+Девять принцев Амбера
+
+<b>Роберт Шекли</b>
+Цивилизация статуса
+
+<b>Дмитрий Емец</b>
+Пират против всей галактики
+
+<b>Василий Головачев</b>
+Голубятня на жёлтой поляне
+
+<b>Роберт Асприн</b>
+МИФ
+
+<b>Сапковский</b>
+Ведьмак
+
+<b>Нил Гейман</b>
+Скандинавские боги
+
+<b>Гарт Никс</b>
+Ключи от королевства
+
+<b>Наталья Щерба</b>
+Часодеи
+
+    </pre>
+  </div>
+
+  <div *ngIf="activeTab === 'detective'">
+    <h2>Детектив</h2>
+    <pre>
+<b>Конан Дойл</b>
+Шерлок Холмс
+    </pre>
+  </div>
+
+  <div *ngIf="activeTab === 'sci-fi'">
+    <h2>Научная фантастика</h2>
+    <pre>
+
+    </pre>
+  </div>
+
+  <div *ngIf="activeTab === 'Horror'">
+    <h2>Хоррор</h2>
+    <pre>
+
+    </pre>
+  </div>
+
+  <div *ngIf="activeTab === 'Novel'">
+    <h2>Романы</h2>
+    <pre>
+<b>Оскар Уайльд</b>
+Дориан Грей
+
+<b>Булгаков</b>
+Мастер и Маргарита
+    </pre>
+
+  </div>  <div *ngIf="activeTab === 'History'">
+    <h2>Истории</h2>
+    <pre>
+Библия
+
+    </pre>
+  </div>
+
+  <div *ngIf="activeTab === 'UnpublishedBooks'">
+    <h2>Не вышедшие книги</h2>
+    <pre>
+<b>Илья Трепаков</b>
+Лор Атласа
+Бронзовая медь
+    </pre>
+  </div>
+</div>

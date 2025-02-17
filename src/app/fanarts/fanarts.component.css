@@ -1,0 +1,242 @@
+.gallery {
+  text-align: center;
+  white-space: nowrap;
+  color: black;
+  padding: 10px 20px;
+  background-color: transparent;
+  font-family: 'PPNeueMachina', Arial, sans-serif;
+  cursor: pointer;
+  border: none;
+  border-radius: 1px;
+  font-size: 25px;
+  font-weight: 400;
+  font-family: 'PPNeueMachina';
+  letter-spacing: 1px;
+}
+
+.tabs-scrollable {
+  text-transform: uppercase;
+}
+.image-name {
+  font-size: 30px;
+  margin-top: 10px;
+}
+
+.button-more {
+  background-color: black;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+  margin-top: 20px;
+  border: 1px solid transparent;
+}
+
+  .button-more:hover {
+    background-color: white;
+    color: black;
+    border-color: black;
+  }
+
+.gallery-heading {
+  text-transform: uppercase;
+  font-size: 36px;
+  margin-bottom: 90px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1px;
+  list-style-type: none;
+  padding: 0;
+}
+
+  .tabs li {
+    white-space: nowrap;
+    color: gray;
+    padding: 10px 20px;
+    background-color: transparent;
+    font-family: 'PPNeueMachina', Arial, sans-serif;
+    font-family: 'PPNeueMachina';
+    cursor: pointer;
+    margin: 0 70px;
+    border: none;
+    border-radius: 1px;
+    font-size: 25px;
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+
+    .tabs li.selected {
+      color: black;
+    }
+
+.tab-content {
+  padding: 20px;
+  border-radius: 5px;
+  margin-top: 50px;
+}
+
+.line-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background-color: gray;
+  border-radius: 1px;
+  transition: background-color 0.3s ease;
+}
+
+.tabs li.selected + .line-wrapper .line {
+  background-color: black;
+}
+
+.line-middle {
+  width: 30px;
+  height: 1px;
+  background-color: gray;
+  margin: 0 10px;
+  border-radius: 1px;
+}
+
+.image-row {
+  display: flex;
+  justify-content: center;
+}
+
+.image-col {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+}
+
+  .image-col img {
+    max-width: 100%;
+    height: auto;
+    width: 100%;
+  }
+
+@media (max-width: 991px) {
+  .image-row {
+    justify-content: flex-start;
+  }
+
+  .image-col {
+    flex-basis: 33.33%;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .gallery-heading {
+    font-size: 24px;
+    margin-bottom: 40px;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    margin-bottom: 20px;
+  }
+
+    .tabs li {
+      margin: 0 10px;
+      font-family: 'PPNeueMachina', Arial, sans-serif;
+    }
+
+  .tab-text {
+    font-size: 20px;
+    line-height: 1.2;
+  }
+
+  .tab-content {
+    padding: 20px;
+    border-radius: 5px;
+    margin-top: 50px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .image-row {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+
+  .image-col {
+    flex: 0 0 33.33%;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+    .image-col img {
+      max-width: 100%;
+      height: auto;
+      width: 100%;
+      margin-bottom: 10px;
+      object-fit: cover;
+    }
+
+
+  .image-name {
+    font-size: 1em;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .button-more {
+    font-size: 16px;
+    padding: 10px 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media only screen and (max-width: 768px) {
+  .image-row {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .image-col {
+    flex: 0 0 33.33%;
+    padding: 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+    .image-col img {
+      max-width: 100%;
+      height: auto;
+      width: 100%;
+      margin-bottom: 10px;
+      object-fit: cover;
+    }
+
+
+  .button-more {
+    font-size: 18px;
+    padding: 12px 24px;
+  }
+}

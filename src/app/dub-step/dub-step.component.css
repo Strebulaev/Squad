@@ -1,0 +1,65 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+
+.background-container {
+  position: absolute;
+  left: 0;
+  background-image: url('/assets/images/backstep.jpg');
+  background-size: 11% 12%; /* Увеличиваем размер фона автоматически */
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow-y: scroll; /* Добавляем возможность прокрутки по вертикали */
+}
+
+#imageContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px; /* Добавляем отступы для разделения от большого фона */
+  box-sizing: border-box;
+}
+
+  #imageContainer img {
+    width: 900px; /* Задаем фиксированную ширину */
+    height: auto; /* Автоматически вычисляем высоту, чтобы сохранить пропорции */
+    margin-bottom: 0px; /* Добавляем отступ между картинками */
+  }
+
+@media (max-width: 768px) {
+  .background-container {
+    background-size: auto;
+    background-attachment: scroll; /* Отключаем фиксацию фонового изображения */
+    height: auto;
+  }
+    .background-container::before {
+      position: fixed; /* Изменяем на fixed */
+    }
+
+  #imageContainer img {
+    width: 40%; /* Адаптируем размер картинок под ширину экрана */
+  }
+}
+@media (max-width: 576px) {
+  /* Стили для мобильных устройств с шириной до 576px */
+  .background-container {
+    background-size: 50% auto; /* Примерный размер фона на мобильных устройствах */
+  }
+}
+
+@media (min-width: 577px) and (max-width: 991px) {
+  /* Стили для планшетов с шириной от 577px до 991px */
+  .background-container {
+    background-size: 20% auto; /* Примерный размер фона на планшетах */
+  }
+}
+
+@media (min-width: 992px) {
+  /* Стили для настольных устройств с шириной от 992px и выше */
+  .background-container {
+    background-size: 11% 12%; /* Примерный размер фона на настольных устройствах */
+  }
+}

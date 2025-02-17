@@ -1,0 +1,144 @@
+/* Стили кнопки "Скрыть/показать комментарии" */
+.toggle-comments {
+  display: inline-block;
+  font-size: 24px;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+  color: #0088cc; /* Цвет символа */
+  background-color: #ffffff; /* Цвет фона кнопки */
+  border: none; /* Убираем границу кнопки */
+  border-radius: 50%; /* Круглая форма кнопки */
+  padding: 5px; /* Отступ внутри кнопки */
+}
+
+/* Стили блока комментариев */
+.comments {
+  display: block; /* Скрываем комментарии по умолчанию */
+  color: black;
+}
+
+  .comments.show {
+    display: none; /* Показываем комментарии при активации */
+  }
+
+/* Стили кнопки удаления комментария */
+.delete-comment-btn {
+  font-size: 14px;
+  color: #0088cc; /* Цвет символа */
+}
+
+/* Стили заголовков */
+h1, h2, h4 {
+  font-size: 36px;
+  font-weight: bold;
+  text-align: center;
+  color: #0088cc; /* Цвет заголовков */
+  margin-bottom: 40px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+/* Стили основного фона и блока */
+body {
+  background-color: #ffffff; /* Цвет фона всей страницы */
+}
+
+div {
+  color: #222222; /* Цвет текста */
+  background-color: #f2f2f2; /* Цвет фона блока */
+  margin-bottom: 40px;
+  font-family: 'Arial', sans-serif;
+  padding: 20px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Тень блока */
+}
+
+/* Стили списка комментариев */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background-color: #ffffff; /* Цвет фона комментария */
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+  li strong {
+    color: #0088cc; /* Цвет имени автора */
+  }
+
+/* Стили полей ввода и кнопки */
+input[type="text"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #0088cc; /* Граница полей ввода */
+  border-radius: 5px;
+}
+
+button {
+  background-color: #0088cc; /* Цвет фона кнопки */
+  color: #ffffff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+  button:hover {
+    background-color: #00558a; /* Цвет фона кнопки при наведении */
+  }
+
+/* Медиа-запросы для адаптивности стилей */
+@media (max-width: 480px) {
+  h1, h2, h4 {
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
+
+  div {
+    margin-bottom: 10px;
+    padding: 5px;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+  }
+
+  h3 {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+
+  li {
+    margin-bottom: 2px;
+  }
+
+  input[type="text"],
+  textarea {
+    padding: 3px;
+  }
+}
+
+@media (max-width: 768px) {
+  h1, h2, h4 {
+    font-size: 30px;
+  }
+
+  h3 {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 1024px) {
+  h1, h2, h4 {
+    font-size: 32px;
+  }
+
+  h3 {
+    font-size: 22px;
+  }
+}
