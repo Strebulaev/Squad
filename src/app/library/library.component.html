@@ -9,100 +9,94 @@
 </div>
 
 <div class="tab-content">
+  <!-- Фантастика -->
   <div *ngIf="activeTab === 'fantasy'">
     <h2>Фантастика</h2>
-    <pre>
-
-<b>Дж.Р.Р. Толкиен</b>
-Хоббит: Туда и обратно
-Властелин Колец: хранители кольца
-Властелин Колец: Две твердыни
-Властелин Колец: Возвращение короля
-Сильмариллион
-Неоконченные предания Нуменора и Средиземья
-Дети Хурина
-Берен и Лутиэн
-Падение Гондолина
-Песни Белерианда
-Устроение Средиземья
-
-<b>Роджер Желязны</b>
-Князь света
-Девять принцев Амбера
-
-<b>Роберт Шекли</b>
-Цивилизация статуса
-
-<b>Дмитрий Емец</b>
-Пират против всей галактики
-
-<b>Василий Головачев</b>
-Голубятня на жёлтой поляне
-
-<b>Роберт Асприн</b>
-МИФ
-
-<b>Сапковский</b>
-Ведьмак
-
-<b>Нил Гейман</b>
-Скандинавские боги
-
-<b>Гарт Никс</b>
-Ключи от королевства
-
-<b>Наталья Щерба</b>
-Часодеи
-
-    </pre>
+    <ul>
+      <li *ngFor="let book of fantasyBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 
+  <!-- Детектив -->
   <div *ngIf="activeTab === 'detective'">
     <h2>Детектив</h2>
-    <pre>
-<b>Конан Дойл</b>
-Шерлок Холмс
-    </pre>
+    <ul>
+      <li *ngFor="let book of detectiveBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 
+  <!-- Научная фантастика -->
   <div *ngIf="activeTab === 'sci-fi'">
     <h2>Научная фантастика</h2>
-    <pre>
-
-    </pre>
+    <ul>
+      <li *ngFor="let book of sciFiBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 
+  <!-- Хоррор -->
   <div *ngIf="activeTab === 'Horror'">
     <h2>Хоррор</h2>
-    <pre>
-
-    </pre>
+    <ul>
+      <li *ngFor="let book of horrorBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 
+  <!-- Роман -->
   <div *ngIf="activeTab === 'Novel'">
-    <h2>Романы</h2>
-    <pre>
-<b>Оскар Уайльд</b>
-Дориан Грей
-
-<b>Булгаков</b>
-Мастер и Маргарита
-    </pre>
-
-  </div>  <div *ngIf="activeTab === 'History'">
-    <h2>Истории</h2>
-    <pre>
-Библия
-
-    </pre>
+    <h2>Роман</h2>
+    <ul>
+      <li *ngFor="let book of novelBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 
+  <!-- История -->
+  <div *ngIf="activeTab === 'History'">
+    <h2>История</h2>
+    <ul>
+      <li *ngFor="let book of historyBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Не вышедшие книги -->
   <div *ngIf="activeTab === 'UnpublishedBooks'">
     <h2>Не вышедшие книги</h2>
-    <pre>
-<b>Илья Трепаков</b>
-Лор Атласа
-Бронзовая медь
-    </pre>
+    <ul>
+      <li *ngFor="let book of unpublishedBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
   </div>
 </div>

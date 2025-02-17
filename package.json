@@ -11,17 +11,17 @@
     "prestart": "node aspnetcore-https",
     "start:windows": "ng serve"
   },
-
   "private": true,
   "dependencies": {
     "@angular/animations": "^18.0.2",
     "@angular/cdk": "^17.2.2",
     "@angular/common": "^18.0.2",
     "@angular/compiler": "^18.0.2",
-    "@angular/core": "^18.0.2",
+    "@angular/core": "^18.2.13",
     "@angular/material": "17.2.2",
     "@angular/platform-browser": "^18.0.2",
     "@angular/platform-browser-dynamic": "^18.0.2",
+    "@angular/platform-server": "^19.1.6",
     "@angular/router": "^18.0.2",
     "@vercel/speed-insights": "^1.0.9",
     "axios": "^1.6.8",
