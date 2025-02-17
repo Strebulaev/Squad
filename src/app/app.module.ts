@@ -23,7 +23,7 @@ import { CountdownComponent } from './countdown/countdown.component';
 import { IisComponent } from './iis/iis.component';
 import { CommonModule } from '@angular/common';
 import { TetrisComponent } from './tetris/tetris.component';
-import { ChatComponent } from './chat/chat.component';
+//import { ChatComponent } from './chat/chat.component';
 import { LibraryComponent } from './library/library.component';
 
 @NgModule({
@@ -44,7 +44,7 @@ import { LibraryComponent } from './library/library.component';
     DonatComponent,
     LoreComponent,
     TetrisComponent,
-    ChatComponent,
+    //ChatComponent,
     LibraryComponent,
 
   ],
@@ -72,7 +72,7 @@ import { LibraryComponent } from './library/library.component';
       { path: 'iis', component: IisComponent },
       { path: 'countdown', component: CountdownComponent },
       { path: 'tetris', component: TetrisComponent },
-      { path: 'chat', component: ChatComponent },
+      //{ path: 'chat', component: ChatComponent },
       { path: 'library', component: LibraryComponent },
     ]),
   ],

@@ -1,5 +1,3 @@
-// Используйте импорт для создания proxy middleware
-import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const PROXY_CONFIG = [
   {
