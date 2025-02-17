@@ -1,14 +1,22 @@
 import { Component } from '@angular/core';
 
+export interface Book {
+  title: string;
+  read: boolean;
+}
+
 @Component({
   selector: 'app-library',
   templateUrl: './library.component.html',
   styleUrls: ['./library.component.css']
 })
 export class LibraryComponent {
-  activeTab: string = 'fantasy';
 
-  fantasyBooks = [
+  activeTab: string = 'Fantasy';
+
+  fantasyBooks: Book[] = [
+    { title: 'Хоббит: Туда и обратно', read: false },
+    { title: 'Властелин Колец: хранители кольца', read: false },
     { title: 'Хоббит: Туда и обратно', read: false },
     { title: 'Властелин Колец: хранители кольца', read: false },
     { title: 'Властелин Колец: Две твердыни', read: false },
@@ -32,28 +40,28 @@ export class LibraryComponent {
     { title: 'Часодеи', read: false }
   ];
 
-  detectiveBooks = [
+  detectiveBooks: Book[] = [
     { title: 'Шерлок Холмс', read: false }
   ];
 
-  sciFiBooks = [
+  sciFiBooks: Book[] = [
     { title: 'Дюна', read: false },
     { title: '1984', read: false },
   ];
 
-  horrorBooks = [
+  horrorBooks: Book[] = [
   ];
 
-  novelBooks = [
+  novelBooks: Book[] = [
     { title: 'Дориан Грей', read: false },
     { title: 'Мастер и Маргарита', read: false }
   ];
 
-  historyBooks = [
+  historyBooks: Book[] = [
     { title: 'Библия', read: false }
   ];
 
-  unpublishedBooks = [
+  unpublishedBooks: Book[] = [
     { title: 'Лор Атласа', read: false },
     { title: 'Бронзовая медь', read: false }
   ];
@@ -62,7 +70,7 @@ export class LibraryComponent {
     this.activeTab = tab;
   }
 
-  updateReadStatus(book: any) {
+  updateReadStatus(book: Book) {
     console.log(`${book.title} is now ${book.read ? 'read' : 'unread'}`);
   }
 }

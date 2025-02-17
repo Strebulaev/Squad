@@ -1,17 +1,17 @@
-<div class="tabs">
-  <button (click)="selectTab('fantasy')" [class.active]="activeTab === 'fantasy'">Фантастика</button>
-  <button (click)="selectTab('detective')" [class.active]="activeTab === 'detective'">Детектив</button>
-  <button (click)="selectTab('sci-fi')" [class.active]="activeTab === 'sci-fi'">Научная фантастика</button>
-  <button (click)="selectTab('Horror')" [class.active]="activeTab === 'Horror'">Хоррор</button>
-  <button (click)="selectTab('Novel')" [class.active]="activeTab === 'Novel'">Роман</button>
-  <button (click)="selectTab('History')" [class.active]="activeTab === 'History'">История</button>
-  <button (click)="selectTab('UnpublishedBooks')" [class.active]="activeTab === 'UnpublishedBooks'">Не вышедшие книги</button>
-</div>
+<div>
+  <nav>
+    <button (click)="selectTab('Fantasy')">Фэнтези</button>
+    <button (click)="selectTab('Detective')">Детектив</button>
+    <button (click)="selectTab('SciFi')">Научная фантастика</button>
+    <button (click)="selectTab('Horror')">Хоррор</button>
+    <button (click)="selectTab('Novel')">Роман</button>
+    <button (click)="selectTab('History')">История</button>
+    <button (click)="selectTab('UnpublishedBooks')">Не вышедшие книги</button>
+  </nav>
 
-<div class="tab-content">
-  <!-- Фантастика -->
-  <div *ngIf="activeTab === 'fantasy'">
-    <h2>Фантастика</h2>
+  <!-- Фэнтези -->
+  <div *ngIf="activeTab === 'Fantasy'">
+    <h2>Фэнтези</h2>
     <ul>
       <li *ngFor="let book of fantasyBooks">
         <label>
@@ -23,7 +23,7 @@
   </div>
 
   <!-- Детектив -->
-  <div *ngIf="activeTab === 'detective'">
+  <div *ngIf="activeTab === 'Detective'">
     <h2>Детектив</h2>
     <ul>
       <li *ngFor="let book of detectiveBooks">
@@ -36,7 +36,7 @@
   </div>
 
   <!-- Научная фантастика -->
-  <div *ngIf="activeTab === 'sci-fi'">
+  <div *ngIf="activeTab === 'SciFi'">
     <h2>Научная фантастика</h2>
     <ul>
       <li *ngFor="let book of sciFiBooks">

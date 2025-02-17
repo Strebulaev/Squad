@@ -1,34 +1,39 @@
-.tabs {
-  display: flex;
-  margin-bottom: 10px;
+div {
+  font-family: 'Arial', sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
-  .tabs button {
-    padding: 10px;
-    border: none;
-    background: #f1f1f1;
-    cursor: pointer;
-    margin-right: 5px;
-    border-radius: 5px;
-    transition: background 0.3s ease;
+nav {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+button {
+  padding: 20px 5px;
+  border: none;
+  border-radius: 25px;
+  background-color: #56cfe1;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+  button:hover {
+    background-color: #38b6a0;
+    transform: scale(1.05);
   }
 
-    .tabs button.active {
-      background: #007bff;
-      color: white;
-    }
-
-    .tabs button:hover {
-      background: #0056b3;
-      color: white;
-    }
-
-.tab-content {
-  border: 1px solid #ccc;
-  padding: 20px;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 15px;
 }
 
 ul {
@@ -37,20 +42,35 @@ ul {
 }
 
 li {
+  background-color: white;
   margin: 10px 0;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
 }
+
+  li:hover {
+    transform: translateY(-2px);
+  }
 
 label {
   display: flex;
   align-items: center;
-  cursor: pointer;
 }
 
 input[type="checkbox"] {
   margin-right: 10px;
+  cursor: pointer;
 }
 
 .read {
   text-decoration: line-through;
-  color: #888;
+  color: #aaa;
+}
+
+span {
+  font-size: 16px;
 }
