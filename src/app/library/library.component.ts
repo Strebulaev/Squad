@@ -42,7 +42,6 @@ export class LibraryComponent {
   ];
 
   horrorBooks = [
-    { title: '1984', read: false },
   ];
 
   novelBooks = [
