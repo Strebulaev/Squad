@@ -8,6 +8,7 @@ import { Component } from '@angular/core';
 export class LibraryComponent {
   activeTab: string = 'fantasy';
 
+  // Массивы книг для каждого жанра
   fantasyBooks = [
     { title: 'Хоббит: Туда и обратно', read: false },
     { title: 'Властелин Колец: хранители кольца', read: false },
@@ -30,6 +31,36 @@ export class LibraryComponent {
     { title: 'Скандинавские боги', read: false },
     { title: 'Ключи от королевства', read: false },
     { title: 'Часодеи', read: false }
+  ];
+
+  detectiveBooks = [
+    { title: 'Шерлок Холмс', read: false }
+  ];
+
+  sciFiBooks = [
+    { title: 'Дюна', read: false },
+    { title: '1984', read: false },
+    { title: 'Солярис', read: false }
+  ];
+
+  horrorBooks = [
+    { title: 'Оно', read: false },
+    { title: 'Дракула', read: false },
+    { title: 'Сияние', read: false }
+  ];
+
+  novelBooks = [
+    { title: 'Дориан Грей', read: false },
+    { title: 'Мастер и Маргарита', read: false }
+  ];
+
+  historyBooks = [
+    { title: 'Библия', read: false }
+  ];
+
+  unpublishedBooks = [
+    { title: 'Лор Атласа', read: false },
+    { title: 'Бронзовая медь', read: false }
   ];
 
   selectTab(tab: string) {
