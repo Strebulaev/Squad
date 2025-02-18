@@ -16,7 +16,6 @@ export class FanartsComponent {
     { name: 'Это майнкрафтер', imageUrl: '/assets/images/5orka.jpg' },
     { name: 'Аль-Хайтам', imageUrl: '/assets/images/alhaitam.jpg' },
     { name: 'Дехья', imageUrl: '/assets/images/dehyia.jpg' },
-    // добавьте другие персонажи
   ];
 
   fanarts: any[] = [
