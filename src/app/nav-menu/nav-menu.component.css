@@ -5,13 +5,15 @@ a.navbar-brand {
 }
 
 .box-shadow {
-  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+  box-shadow: 0 .25rem .75rem rgb(206, 19, 19);
 }
 
 .centered-text {
   text-align: center;
+  color: white;
 }
 
 .dropdown:hover .dropdown-menu {
   display: block;
 }
+

@@ -1,60 +1,177 @@
-/* Общие стили для страницы */
-body {
-  font-family: 'Arial', sans-serif;
-  background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+html, body {
   margin: 0;
   padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
+  width: 101.8%;
+  height: 110%;
+  font-family: 'Arial', sans-serif;
+  background: radial-gradient(circle, #1a1a1a, #000000);
+  color: #000000;
+  overflow: hidden; /* Скрываем полосы прокрутки */
+}
+
+.content-section {
+  width: 101.8%;
+  overflow-y: auto; /* Прокрутка внутри контейнера */
+  padding: 0px;
+  box-sizing: border-box; /* Учитываем padding в ширине */
 }
 
 .container {
-  max-width: 1200px;
-  width: 100%;
-  background: white;
-  border-radius: 20px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  margin: 20px;
+  height: 92.3vh;
+  display: block;
+  justify-content: center;
+  align-items: center;
+  margin-top: -16px;
+  min-width: 118.671%;
+  margin-left: -124px;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Стилизация полосы прокрутки */
+::-webkit-scrollbar {
+  width: 15px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 10px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+}
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+/* Стилизация полосы прокрутки для каждой темы */
+.fantasy-theme::-webkit-scrollbar-thumb {
+  background: rgba(255, 215, 0, 0.5);
+}
+
+.detective-theme::-webkit-scrollbar-thumb {
+  background: rgba(241, 196, 15, 0.5);
+}
+
+.scifi-theme::-webkit-scrollbar-thumb {
+  background: rgba(0, 255, 255, 0.5);
+}
+
+.horror-theme::-webkit-scrollbar-thumb {
+  background: rgba(255, 68, 68, 0.5);
+}
+
+.novel-theme::-webkit-scrollbar-thumb {
+  background: rgba(255, 175, 189, 0.5);
+}
+
+.history-theme::-webkit-scrollbar-thumb {
+  background: rgba(166, 138, 100, 0.5);
+}
+
+.unpublished-theme::-webkit-scrollbar-thumb {
+  background: rgba(189, 195, 199, 0.5);
 }
 
 nav {
   display: flex;
   justify-content: space-around;
-  background: linear-gradient(135deg, #56cfe1, #38b6a0);
-  padding: 15px;
-  border-bottom: 2px solid #38b6a0;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.9);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+  width: 101.8%;
+  height: 100px;
 }
 
+.fantasy-theme,
+.detective-theme,
+.scifi-theme,
+.horror-theme,
+.novel-theme,
+.history-theme,
+.unpublished-theme {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex-grow: 1;
+  padding: 0px;
+}
+
+/* Остальные стили (кнопки, списки и т.д.) */
 button {
-  padding: 15px 25px;
+  padding: 5px 10px;
   border: none;
-  border-radius: 30px;
-  background-color: transparent;
+  border-radius: 50px;
+  background: transparent;
   color: white;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  transition: all 0.5s ease;
   font-size: 16px;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 150px;
 }
 
+  button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 200%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    transform: translate(-50%, -50%) scale(0);
+    transition: transform 0.5s ease;
+    border-radius: 50%;
+  }
+
+  button:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
   button:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
   }
 
 h2 {
   text-align: center;
-  color: #333;
-  margin-bottom: 20px;
-  font-size: 28px;
+  margin-bottom: 40px;
+  padding-top: 40px;
+  font-size: 36px;
   font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  height: 100px;
+  position: relative;
 }
+
+  h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #fff, transparent);
+    transform: translateX(-50%);
+  }
 
 ul {
   list-style-type: none;
@@ -63,18 +180,36 @@ ul {
 }
 
 li {
-  background-color: white;
-  margin: 10px 0;
-  border-radius: 10px;
-  padding: 15px;
-  display: flex;
+  background: rgba(255, 255, 255, 0.05);
+  margin: 15px 0;
+  border-radius: 15px;
+  padding: 20px;
+  display: block;
   align-items: center;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+  li::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(12, 182, 68, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  li:hover::before {
+    left: 100%;
+  }
+
   li:hover {
-    transform: translateY(-2px);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
   }
 
 label {
@@ -83,189 +218,251 @@ label {
 }
 
 input[type="checkbox"] {
-  margin-right: 10px;
+  margin-right: 15px;
   cursor: pointer;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #00ffff;
+  border-radius: 5px;
+  position: relative;
 }
+
+  input[type="checkbox"]:checked::before {
+    content: '❤️';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ffff;
+    font-size: 14px;
+  }
 
 .read {
   text-decoration: line-through;
-  color: #aaa;
+  color: #f1c40f;
 }
 
 span {
-  font-size: 16px;
-  color: #333;
+  font-size: 18px;
+  color: #fff;
 }
 
 /* Фэнтези */
 .fantasy-theme {
-  background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-  border: 2px solid #ff6f61;
+  background: radial-gradient(circle, #4b0082, #000000);
 }
 
-.fantasy-theme h2 {
-  color: #6d2e46;
+  .fantasy-theme h2 {
+    color: #ffd700;
+    text-shadow: 0 0 10px #ffd700, 0 0 20px #ffd700;
+  }
+
+.fantasy-btn {
+  background: linear-gradient(135deg, #8a2be2, #4b0082);
+  color: #ffd700;
   font-family: 'Cinzel', serif;
 }
 
-.fantasy-theme li {
-  background-color: #fff3e6;
-  border: 1px solid #ff6f61;
-}
-
-.fantasy-theme button {
-  background-color: #6d2e46;
-}
-
-  .fantasy-theme button:hover {
-    background-color: #8a3a4f;
+  .fantasy-btn:hover {
+    background: linear-gradient(135deg, #4b0082, #8a2be2);
   }
 
 /* Детектив */
 .detective-theme {
-  background: linear-gradient(135deg, #2c3e50, #34495e);
-  border: 2px solid #1a1a1a;
+  background: radial-gradient(circle, #2c3e50, #000000);
 }
 
-.detective-theme h2 {
-  color: #ecf0f1;
+  .detective-theme h2 {
+    color: #f1c40f;
+    text-shadow: 0 0 10px #f1c40f, 0 0 20px #f1c40f;
+  }
+
+.detective-btn {
+  background: linear-gradient(135deg, #34495e, #2c3e50);
+  color: #f1c40f;
   font-family: 'Courier New', monospace;
 }
 
-.detective-theme li {
-  background-color: #ecf0f1;
-  border: 1px solid #1a1a1a;
-}
-
-.detective-theme button {
-  background-color: #1a1a1a;
-}
-
-  .detective-theme button:hover {
-    background-color: #2c3e50;
+  .detective-btn:hover {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
   }
-
-
 
 /* Научная фантастика */
 .scifi-theme {
-  background: linear-gradient(135deg, #0f4c75, #3282b8);
-  border: 2px solid #1b262c;
+  background: radial-gradient(circle, #0f4c75, #000000);
 }
 
-.scifi-theme h2 {
-  color: #bbe1fa;
+  .scifi-theme h2 {
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  }
+
+.scifi-btn {
+  background: linear-gradient(135deg, #00ffff, #0f4c75);
+  color: #1b262c;
   font-family: 'Orbitron', sans-serif;
 }
 
-.scifi-theme li {
-  background-color: #bbe1fa;
-  border: 1px solid #1b262c;
-}
-
-.scifi-theme button {
-  background-color: #1b262c;
-}
-
-.scifi-theme button:hover {
-    background-color: #0f4c75;
+  .scifi-btn:hover {
+    background: linear-gradient(135deg, #0f4c75, #00ffff);
   }
-
 
 /* Хоррор */
 .horror-theme {
-  background: linear-gradient(135deg, #2d3436, #636e72);
-  border: 2px solid #d63031;
+  background: radial-gradient(circle, #8b0000, #000000);
 }
 
-.horror-theme h2 {
-  color: #ff7675;
+  .horror-theme h2 {
+    color: #ff4444;
+    text-shadow: 0 0 10px #ff4444, 0 0 20px #ff4444;
+  }
+
+.horror-btn {
+  background: linear-gradient(135deg, #8b0000, #ff0000);
+  color: #fff;
   font-family: 'Creepster', cursive;
 }
 
-.horror-theme li {
-  background-color: #ff7675;
-  border: 1px solid #d63031;
-}
-
-.horror-theme button {
-  background-color: #d63031;
-}
-
-.horror-theme button:hover {
-    background-color: #ff7675;
+  .horror-btn:hover {
+    background: linear-gradient(135deg, #ff0000, #8b0000);
   }
-
 
 /* Роман */
 .novel-theme {
-  background: linear-gradient(135deg, #ffafbd, #ffc3a0);
-  border: 2px solid #ff6b6b;
+  background: radial-gradient(circle, #ff6b6b, #000000);
 }
 
-.novel-theme h2 {
-  color: #6b5b95;
+  .novel-theme h2 {
+    color: #ffafbd;
+    text-shadow: 0 0 10px #ffafbd, 0 0 20px #ffafbd;
+  }
+
+.novel-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ffafbd);
+  color: #fff;
   font-family: 'Dancing Script', cursive;
 }
 
-.novel-theme li {
-  background-color: #fff0f5;
-  border: 1px solid #ff6b6b;
-}
-
-.novel-theme button {
-  background-color: #6b5b95;
-}
-
-.novel-theme button:hover {
-  background-color: #8a6bb1;
-}
-
+  .novel-btn:hover {
+    background: linear-gradient(135deg, #ffafbd, #ff6b6b);
+  }
 
 /* История */
 .history-theme {
-  background: linear-gradient(135deg, #8b7355, #a68a64);
-  border: 2px solid #5d432c;
+  background: radial-gradient(circle, #8b7355, #000000);
 }
 
-.history-theme h2 {
-  color: #3e2a1e;
+  .history-theme h2 {
+    color: #b99058;
+    text-shadow: 0 0 10px #a68a64, 0 0 20px #a68a64;
+  }
+
+.history-btn {
+  background: linear-gradient(135deg, #5d432c, #8b7355);
+  color: #fff;
   font-family: 'Old Standard TT', serif;
 }
 
-.history-theme li {
-  background-color: #f4e7d3;
-  border: 1px solid #5d432c;
-}
-
-.history-theme button {
-  background-color: #5d432c;
-}
-
-.history-theme button:hover {
-  background-color: #8b7355;
-}
+  .history-btn:hover {
+    background: linear-gradient(135deg, #8b7355, #5d432c);
+  }
 
 /* Не вышедшие книги */
 .unpublished-theme {
-  background: linear-gradient(135deg, #bdc3c7, #2c3e50);
-  border: 2px solid #7f8c8d;
+  background: radial-gradient(circle, #2c3e50, #000000);
 }
 
-.unpublished-theme h2 {
-  color: #ecf0f1;
+  .unpublished-theme h2 {
+    color: #e1e1e1;
+    text-shadow: 0 0 10px #bdc3c7, 0 0 20px #bdc3c7;
+  }
+
+.unpublished-btn {
+  background: linear-gradient(135deg, #7f8c8d, #95a5a6);
+  color: #fff;
   font-family: 'Raleway', sans-serif;
 }
 
-.unpublished-theme li {
-  background-color: #ecf0f1;
-  border: 1px solid #7f8c8d;
+  .unpublished-btn:hover {
+    background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+  }
+
+/* Стили для уникальных иконок чекбоксов и цветов зачеркивания */
+
+/* Фэнтези */
+.fantasy-theme input[type="checkbox"]:checked::before {
+  content: "⚔️"; /* Меч */
+  color: #ffd700; /* Золотой */
 }
 
-.unpublished-theme button {
-  background-color: #7f8c8d;
+.fantasy-theme .read {
+  color: #ffd700;
+  text-decoration-color: #ffd700;
 }
 
-.unpublished-theme button:hover {
-  background-color: #95a5a6;
+/* Детектив */
+.detective-theme input[type="checkbox"]:checked::before {
+  content: "🕵️"; /* Детектив */
+  color: #f1c40f; /* Желтый */
+}
+
+.detective-theme .read {
+  color: #f1c40f;
+  text-decoration-color: #f1c40f;
+}
+
+/* Научная фантастика */
+.scifi-theme input[type="checkbox"]:checked::before {
+  content: "🚀"; /* Ракета */
+  color: #00ffff; /* Голубой */
+}
+
+.scifi-theme .read {
+  color: #00ffff;
+  text-decoration-color: #00ffff;
+}
+
+/* Хоррор */
+.horror-theme input[type="checkbox"]:checked::before {
+  content: "👻"; /* Привидение */
+  color: #ff4444; /* Красный */
+}
+
+.horror-theme .read {
+  color: #ff4444;
+  text-decoration-color: #ff4444;
+}
+
+/* Роман */
+.novel-theme input[type="checkbox"]:checked::before {
+  content: "❤️"; /* Сердечко */
+  color: #ffafbd; /* Розовый */
+}
+
+.novel-theme .read {
+  color: #ffafbd;
+  text-decoration-color: #ffafbd;
+}
+
+/* История */
+.history-theme input[type="checkbox"]:checked::before {
+  content: "🏛️"; /* Колонны */
+  color: #b99058; /* Бежевый */
+}
+
+.history-theme .read {
+  color: #b99058;
+  text-decoration-color: #b99058;
+}
+
+/* Не вышедшие книги */
+.unpublished-theme input[type="checkbox"]:checked::before {
+  content: "🖕"; /* Коробка */
+  color: #bdc3c7; /* Серый */
+}
+
+.unpublished-theme .read {
+  color: #bdc3c7;
+  text-decoration-color: #bdc3c7;
 }

@@ -1,26 +1,23 @@
 <header>
-  <nav class="navbar navbar-expand-md navbar-light bg-white border-bottom box-shadow mb-3">
+  <nav class="navbar navbar-expand-md navbar-light bg-black border-bottom box-shadow mb-3">
     <div class="container">
-      <a id="navbar-brand" class="navbar-brand" [routerLink]="['/home']">170squad</a>
-      <button class="navbar-toggler" type="button" (click)="toggle()" [class.collapsed]="!isExpanded">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      <a id="navbar-brand" class="navbar-brand text-white dropdown-toggle" [routerLink]="['/home']">170squad</a>
       <div class="collapse navbar-collapse" [class.show]="isExpanded">
         <ul class="navbar-nav ml-auto">
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/vikusha']">Викуша</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/vikusha']">Викуша</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" [routerLink]="['/fanarts']">Рисунки</a>
             </div>
           </li>
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/sergey']">Сергей</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/sergey']">Сергей</a>
             <!--<div class="dropdown-menu">
               <a class="dropdown-item" [routerLink]="['/dndchess']">D&Dchess</a>
             </div>-->
           </li>
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/ilusha']">Илюша</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/ilusha']">Илюша</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" [routerLink]="['/lore']">Лор Атласа</a> <!--Сделано-->
               <a class="dropdown-item" [routerLink]="['/bronze-copper']">Бронзовая медь</a><!--Сделано-->
@@ -28,26 +25,26 @@
           </li>
 
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/maksimushka']">Максимушка</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/maksimushka']">Максимушка</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" [routerLink]="['/dub-step']">DubStep</a><!--Сделано-->
             </div>
           </li>
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/arsusha']">Арсюша</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/arsusha']">Арсюша</a>
             <div class="dropdown-menu">
               <a class="dropdown-item" [routerLink]="['/arseniy']">Арсений</a><!--Сделано-->
             </div>
           </li>
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/iis']">=3</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/iis']">=3</a>
           </li>
           <!--<li class="nav-item dropdown" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/chat']">Сквадерок</a>
           </li>-->
-          <!--<li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/tetris']">Вот вам тетрис по рофлу</a>
-          </li>-->
+          <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/tetris']">Вот вам тетрис по рофлу</a>
+          </li>
           <!--<li class="nav-item dropdown" [routerLinkActive]="['link-active']">
             <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/choice']">Выборы</a>
           </li>-->
@@ -55,7 +52,7 @@
             <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/countdown']">Время до выборов</a>
           </li>-->
           <li class="nav-item dropdown" [routerLinkActive]="['link-active']">
-            <a class="nav-link text-dark dropdown-toggle" [routerLink]="['/library']">Библиотека</a>
+            <a class="nav-link text-white dropdown-toggle" [routerLink]="['/library']">Библиотека</a>
           </li>
         </ul>
       </div>

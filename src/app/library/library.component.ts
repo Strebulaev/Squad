@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 export interface Book {
   title: string;
@@ -10,13 +10,10 @@ export interface Book {
   templateUrl: './library.component.html',
   styleUrls: ['./library.component.css'],
 })
-export class LibraryComponent {
-
+export class LibraryComponent implements OnInit {
   activeTab: string = 'Fantasy';
 
   fantasyBooks: Book[] = [
-    { title: 'Хоббит: Туда и обратно', read: false },
-    { title: 'Властелин Колец: хранители кольца', read: false },
     { title: 'Хоббит: Туда и обратно', read: false },
     { title: 'Властелин Колец: хранители кольца', read: false },
     { title: 'Властелин Колец: Две твердыни', read: false },
@@ -50,6 +47,7 @@ export class LibraryComponent {
   ];
 
   horrorBooks: Book[] = [
+    { title: 'Чёрный кот', read: false }
   ];
 
   novelBooks: Book[] = [
@@ -66,11 +64,45 @@ export class LibraryComponent {
     { title: 'Бронзовая медь', read: false }
   ];
 
+  ngOnInit() {
+    this.loadBooksState();
+  }
+
   selectTab(tab: string) {
     this.activeTab = tab;
   }
 
   updateReadStatus(book: Book) {
     console.log(`${book.title} is now ${book.read ? 'read' : 'unread'}`);
+    this.saveBooksState();
+  }
+
+  // Сохраняем состояние всех книг в localStorage
+  saveBooksState() {
+    const booksState = {
+      fantasyBooks: this.fantasyBooks,
+      detectiveBooks: this.detectiveBooks,
+      sciFiBooks: this.sciFiBooks,
+      horrorBooks: this.horrorBooks,
+      novelBooks: this.novelBooks,
+      historyBooks: this.historyBooks,
+      unpublishedBooks: this.unpublishedBooks,
+    };
+    localStorage.setItem('booksState', JSON.stringify(booksState));
+  }
+
+  // Загружаем состояние книг из localStorage
+  loadBooksState() {
+    const savedState = localStorage.getItem('booksState');
+    if (savedState) {
+      const booksState = JSON.parse(savedState);
+      this.fantasyBooks = booksState.fantasyBooks;
+      this.detectiveBooks = booksState.detectiveBooks;
+      this.sciFiBooks = booksState.sciFiBooks;
+      this.horrorBooks = booksState.horrorBooks;
+      this.novelBooks = booksState.novelBooks;
+      this.historyBooks = booksState.historyBooks;
+      this.unpublishedBooks = booksState.unpublishedBooks;
+    }
   }
 }

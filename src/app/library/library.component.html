@@ -1,21 +1,21 @@
-<div>
+<div class="container">
   <nav>
-    <button (click)="selectTab('Fantasy')">Фэнтези</button>
-    <button (click)="selectTab('Detective')">Детектив</button>
-    <button (click)="selectTab('SciFi')">Научная фантастика</button>
-    <button (click)="selectTab('Horror')">Хоррор</button>
-    <button (click)="selectTab('Novel')">Роман</button>
-    <button (click)="selectTab('History')">История</button>
-    <button (click)="selectTab('UnpublishedBooks')">Не вышедшие книги</button>
+    <button class="fantasy-btn" (click)="selectTab('Fantasy')">Фэнтези</button>
+    <button class="detective-btn" (click)="selectTab('Detective')">Детектив</button>
+    <button class="scifi-btn" (click)="selectTab('SciFi')">Научная фантастика</button>
+    <button class="horror-btn" (click)="selectTab('Horror')">Хоррор</button>
+    <button class="novel-btn" (click)="selectTab('Novel')">Роман</button>
+    <button class="history-btn" (click)="selectTab('History')">История</button>
+    <button class="unpublished-btn" (click)="selectTab('UnpublishedBooks')">Не вышедшие книги</button>
   </nav>
 
   <!-- Фэнтези -->
-  <div *ngIf="activeTab === 'Fantasy'" class="fantasy-theme">
+  <div *ngIf="activeTab === 'Fantasy'" class="fantasy-theme content-section">
     <h2>Фэнтези</h2>
     <ul>
       <li *ngFor="let book of fantasyBooks">
         <label>
-          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="fantasy-checkbox">
           <span [class.read]="book.read">{{ book.title }}</span>
         </label>
       </li>
@@ -23,79 +23,80 @@
   </div>
 
   <!-- Детектив -->
-  <div *ngIf="activeTab === 'Detective'" class="detective-theme">
+  <div *ngIf="activeTab === 'Detective'" class="detective-theme content-section">
     <h2>Детектив</h2>
     <ul>
       <li *ngFor="let book of detectiveBooks">
         <label>
-          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="detective-checkbox">
           <span [class.read]="book.read">{{ book.title }}</span>
         </label>
       </li>
     </ul>
   </div>
 
-  <div *ngIf="activeTab === 'SciFi'" class="scifi-theme">
-      <h2>Научная фантастика</h2>
-      <ul>
-        <li *ngFor="let book of sciFiBooks">
-          <label>
-            <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
-            <span [class.read]="book.read">{{ book.title }}</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+  <!-- Научная фантастика -->
+  <div *ngIf="activeTab === 'SciFi'" class="scifi-theme content-section">
+    <h2>Научная фантастика</h2>
+    <ul>
+      <li *ngFor="let book of sciFiBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="scifi-checkbox">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
+  </div>
 
-    <!-- Хоррор -->
-    <div *ngIf="activeTab === 'Horror'" class="horror-theme">
-      <h2>Хоррор</h2>
-      <ul>
-        <li *ngFor="let book of horrorBooks">
-          <label>
-            <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
-            <span [class.read]="book.read">{{ book.title }}</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+  <!-- Хоррор -->
+  <div *ngIf="activeTab === 'Horror'" class="horror-theme content-section">
+    <h2>Хоррор</h2>
+    <ul>
+      <li *ngFor="let book of horrorBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="horror-checkbox">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
+  </div>
 
-    <!-- Роман -->
-    <div *ngIf="activeTab === 'Novel'" class="novel-theme">
-      <h2>Роман</h2>
-      <ul>
-        <li *ngFor="let book of novelBooks">
-          <label>
-            <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
-            <span [class.read]="book.read">{{ book.title }}</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+  <!-- Роман -->
+  <div *ngIf="activeTab === 'Novel'" class="novel-theme content-section">
+    <h2>Роман</h2>
+    <ul>
+      <li *ngFor="let book of novelBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="novel-checkbox">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
+  </div>
 
-    <!-- История -->
-    <div *ngIf="activeTab === 'History'" class="history-theme">
-      <h2>История</h2>
-      <ul>
-        <li *ngFor="let book of historyBooks">
-          <label>
-            <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
-            <span [class.read]="book.read">{{ book.title }}</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+  <!-- История -->
+  <div *ngIf="activeTab === 'History'" class="history-theme content-section">
+    <h2>История</h2>
+    <ul>
+      <li *ngFor="let book of historyBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="history-checkbox">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
+  </div>
 
-    <!-- Не вышедшие книги -->
-    <div *ngIf="activeTab === 'UnpublishedBooks'" class="unpublished-theme">
-      <h2>Не вышедшие книги</h2>
-      <ul>
-        <li *ngFor="let book of unpublishedBooks">
-          <label>
-            <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)">
-            <span [class.read]="book.read">{{ book.title }}</span>
-          </label>
-        </li>
-      </ul>
-    </div>
+  <!-- Не вышедшие книги -->
+  <div *ngIf="activeTab === 'UnpublishedBooks'" class="unpublished-theme content-section">
+    <h2>Не вышедшие книги</h2>
+    <ul>
+      <li *ngFor="let book of unpublishedBooks">
+        <label>
+          <input type="checkbox" [(ngModel)]="book.read" (change)="updateReadStatus(book)" class="unpublished-checkbox">
+          <span [class.read]="book.read">{{ book.title }}</span>
+        </label>
+      </li>
+    </ul>
+  </div>
 </div>
