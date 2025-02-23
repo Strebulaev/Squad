@@ -20,18 +20,22 @@
     <div class="chess-cell"
          *ngFor="let cell of chessBoard"
          [class.selected]="cell === selectedCell"
+         [class.possible-move]="possibleMoves.includes(cell.position)"
+         [class.check]="isCheck && cell.position === kingPosition"
          [style.background-color]="cell.color"
          (click)="selectCell(cell)"
          [class.draggable]="cell.piece !== ''"
-         [attr.draggable]="cell.piece !== '' ? 'true' : null">
+         [attr.draggable]="cell.piece !== '' ? 'true' : null"
+         (dragstart)="onDragStart(cell)"
+         (dragover)="onDragOver($event)"
+         (drop)="onDrop(cell)">
       <div class="chess-cell-inner" [ngClass]="getChessPieceClass(cell)">
         <span>{{ cell.piece }}</span>
       </div>
     </div>
- </div>
-
-
-    <div class="pointRight"></div>
-    <div class="pointLeft"></div>
-    <div class="pointPumpkin"></div>
   </div>
+
+  <div class="pointRight"></div>
+  <div class="pointLeft"></div>
+  <div class="pointPumpkin"></div>
+</div>

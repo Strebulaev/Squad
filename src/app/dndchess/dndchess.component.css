@@ -12,7 +12,7 @@
   }
 }
 
-  .lighting {
+.lighting {
   position: fixed;
   top: 0;
   left: 0;
@@ -180,7 +180,13 @@ title {
   background-repeat: no-repeat;
   background-size: contain;
 }
+.possible-move {
+  background-color: rgba(0, 255, 0, 0.3) !important;
+}
 
+.check {
+  background-color: rgba(255, 0, 0, 0.5) !important;
+}
 .pointLeft {
   position: absolute;
   top: 66%;
@@ -248,4 +254,3 @@ title {
     font-size: 18.75px;
   }
 }
-

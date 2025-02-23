@@ -1,17 +1,22 @@
 import { Component } from '@angular/core';
 
-declare var particlesJS: any;
-
 @Component({
   selector: 'app-dndchess',
   templateUrl: './dndchess.component.html',
   styleUrls: ['./dndchess.component.css']
 })
-export class DndchessComponent{
+export class DndchessComponent {
   chessBoard: ChessCell[] = [];
   selectedCell: ChessCell | null = null;
+  currentPlayer: 'white' | 'black' = 'white';
+  isCheck: boolean = false;
+  dragStartCell: ChessCell | null = null;
+  possibleMoves: number[] = []; // Для подсветки возможных ходов
+  kingPosition: number = -1; // Позиция короля текущего игрока
+
   constructor() {
     this.initializeChessBoard();
+    this.kingPosition = this.findKingPosition();
   }
 
   initializeChessBoard() {
@@ -31,328 +36,166 @@ export class DndchessComponent{
       const col = i % 8;
       const color = (row + col) % 2 === 0 ? 'black' : '#FF7F00';
 
-      this.chessBoard.push({ piece: startingPosition[i], position: i, color: color, name: "", symbol: "" });    }
-  }
-
-  getPawnMoves(cell: ChessCell, isWhite: boolean): number[] {
-    const moves: number[] = [];
-    const col = cell.position % 8;
-    const row = Math.floor(cell.position / 8);
-    const direction = isWhite ? -1 : 1;
-    const targetRow = row + direction;
-
-    if (targetRow >= 0 && targetRow < 8) {
-      const moveForward = targetRow * 8 + col;
-      if (this.isPieceTransparent(this.chessBoard[moveForward].piece)) {
-        moves.push(moveForward);
-        if (row === (isWhite ? 6 : 1)) {
-          const doubleMoveForward = (targetRow + direction) * 8 + col;
-          if (this.isPieceTransparent(this.chessBoard[doubleMoveForward].piece)) {
-            moves.push(doubleMoveForward);
-          }
-        }
-      }
-
-      const targetColLeft = col - 1;
-      if (targetColLeft >= 0) {
-        const moveAttackLeft = targetRow * 8 + targetColLeft;
-        if (!this.isPieceTransparent(this.chessBoard[moveAttackLeft].piece) &&
-          this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[moveAttackLeft])) {
-          moves.push(moveAttackLeft);
-        }
-      }
-
-      const targetColRight = col + 1;
-      if (targetColRight < 8) {
-        const moveAttackRight = targetRow * 8 + targetColRight;
-        if (!this.isPieceTransparent(this.chessBoard[moveAttackRight].piece) &&
-          this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[moveAttackRight])) {
-          moves.push(moveAttackRight);
-        }
-      }
-    }
-
-    return moves;
-  }
-
-
-  getRookMoves(cell: ChessCell): number[] {
-    const moves: number[] = [];
-    const col = cell.position % 8;
-    const row = Math.floor(cell.position / 8);
-
-    for (let i = col + 1; i < 8; i++) {
-      const move = row * 8 + i;
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    for (let i = col - 1; i >= 0; i--) {
-      const move = row * 8 + i;
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    for (let i = row + 1; i < 8; i++) {
-      const move = i * 8 + col;
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    for (let i = row - 1; i >= 0; i--) {
-      const move = i * 8 + col;
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    return moves;
-  }
-
-
-  getBishopMoves(cell: ChessCell): number[] {
-    const moves: number[] = [];
-    const col = cell.position % 8;
-    const row = Math.floor(cell.position / 8);
-
-    for (let i = 1; col + i < 8 && row + i < 8; i++) {
-      const move = (row + i) * 8 + (col + i);
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    for (let i = 1; col - i >= 0 && row + i < 8; i++) {
-      const move = (row + i) * 8 + (col - i);
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    for (let i = 1; col + i < 8 && row - i >= 0; i++) {
-      const move = (row - i) * 8 + (col + i);
-
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    for (let i = 1; col - i >= 0 && row - i >= 0; i++) {
-      const move = (row - i) * 8 + (col - i);
-      if (this.isPieceTransparent(this.chessBoard[move].piece)) {
-        moves.push(move);
-      } else {
-        if (this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-        break;
-      }
-    }
-
-    return moves;
-  }
-
-  getQueenMoves(cell: ChessCell): number[] {
-    const moves: number[] = [];
-    moves.push(...this.getRookMoves(cell));
-    moves.push(...this.getBishopMoves(cell));
-    return moves;
-  }
-
-  getKnightMoves(cell: ChessCell): number[] {
-    const moves: number[] = [];
-    const col = cell.position % 8;
-    const row = Math.floor(cell.position / 8);
-    const potentialMoves = [
-      row + 2, col + 1,
-      row + 1, col + 2,
-      row - 1, col + 2,
-      row - 2, col + 1,
-      row - 2, col - 1,
-      row - 1, col - 2,
-      row + 1, col - 2,
-      row + 2, col - 1
-    ];
-
-    for (let i = 0; i < potentialMoves.length; i += 2) {
-      const moveRow = potentialMoves[i];
-      const moveCol = potentialMoves[i + 1];
-      if (moveRow >= 0 && moveRow < 8 && moveCol >= 0 && moveCol < 8) {
-        const move = moveRow * 8 + moveCol;
-        if (this.isPieceTransparent(this.chessBoard[move].piece) ||
-          this.getCellPieceColor(cell) !== this.getCellPieceColor(this.chessBoard[move])) {
-          moves.push(move);
-        }
-      }
-    }
-
-    return moves;
-  }
-
-
-
-  isPieceTransparent(piece: string): boolean {
-    return piece === '' || piece === ' ';
-  }
-
-  getCellPieceColor(cell: ChessCell): string {
-    if ('♙♖♘♗♕♔'.includes(cell.piece)) {
-      return 'white'; 
-    } else if ('♟♜♞♝♛♚'.includes(cell.piece)) {
-      return 'black'; 
-    } else {
-      return ''; 
+      this.chessBoard.push({ piece: startingPosition[i], position: i, color: color });
     }
   }
 
   getChessPieceClass(cell: ChessCell): string {
-    return cell.piece.toLowerCase();
+    if (!cell.piece) return '';
+
+    switch (cell.piece) {
+      case '♙':
+      case '♟':
+        return 'pawn';
+      case '♖':
+      case '♜':
+        return 'rook';
+      case '♘':
+      case '♞':
+        return 'knight';
+      case '♗':
+      case '♝':
+        return 'bishop';
+      case '♕':
+      case '♛':
+        return 'queen';
+      case '♔':
+      case '♚':
+        return 'king';
+      default:
+        return '';
+    }
   }
 
   selectCell(cell: ChessCell) {
-    if (cell.piece !== '') {
+    if (this.isCheck && !this.isMoveResolvingCheck(cell)) {
+      return;
+    }
+
+    if (cell.piece !== '' && this.isCurrentPlayerPiece(cell)) {
       this.selectedCell = cell;
+      this.possibleMoves = this.getPossibleMoves(cell);
     } else if (this.selectedCell) {
       if (this.isValidMove(this.selectedCell, cell)) {
         this.movePiece(this.selectedCell, cell);
+        this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+        this.checkForCheck();
+        this.kingPosition = this.findKingPosition();
       }
       this.selectedCell = null;
+      this.possibleMoves = [];
     }
   }
+
+  isCurrentPlayerPiece(cell: ChessCell): boolean {
+    const whitePieces = ['♙', '♖', '♘', '♗', '♕', '♔'];
+    const blackPieces = ['♟', '♜', '♞', '♝', '♛', '♚'];
+    return (this.currentPlayer === 'white' && whitePieces.includes(cell.piece)) ||
+      (this.currentPlayer === 'black' && blackPieces.includes(cell.piece));
+  }
+
   isValidMove(sourceCell: ChessCell, targetCell: ChessCell): boolean {
-    const sourcePiece = sourceCell.piece;
+    const piece = sourceCell.piece;
     const targetPiece = targetCell.piece;
-    const isCapture = targetPiece !== '';
+    const sourceRow = Math.floor(sourceCell.position / 8);
+    const sourceCol = sourceCell.position % 8;
+    const targetRow = Math.floor(targetCell.position / 8);
+    const targetCol = targetCell.position % 8;
 
-    switch (sourcePiece) {
+    if (piece === '') return false;
+
+    const isWhitePiece = ['♙', '♖', '♘', '♗', '♕', '♔'].includes(piece);
+    const isBlackPiece = ['♟', '♜', '♞', '♝', '♛', '♚'].includes(piece);
+
+    if ((isWhitePiece && this.currentPlayer === 'black') || (isBlackPiece && this.currentPlayer === 'white')) {
+      return false;
+    }
+
+    switch (piece) {
       case '♙':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          const colDiff = Math.abs(sourceCell.position % 8 - targetCell.position % 8);
-          const rowDiff = Math.floor(targetCell.position / 8) - Math.floor(sourceCell.position / 8);
-          if (colDiff === 1 && rowDiff === -1) {
-            return true;
-          }
-        } else if (targetPiece === '' && this.getPawnMoves(sourceCell, true).includes(targetCell.position)) {
-          return true;
-        }
-        break;
-
       case '♟':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          const colDiff = Math.abs(sourceCell.position % 8 - targetCell.position % 8);
-          const rowDiff = Math.floor(targetCell.position / 8) - Math.floor(sourceCell.position / 8);
-          if (colDiff === 1 && rowDiff === 1) {
-            return true;
-          }
-        } else if (targetPiece === '' && this.getPawnMoves(sourceCell, false).includes(targetCell.position)) {
-          return true;
-        }
-        break;
+        return this.isValidPawnMove(sourceRow, sourceCol, targetRow, targetCol, isWhitePiece, targetPiece);
       case '♖':
       case '♜':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          if (this.getRookMoves(sourceCell).includes(targetCell.position)) {
-            return true;
-          }
-        } else if (targetPiece === '' && this.getRookMoves(sourceCell).includes(targetCell.position)) {
-          return true;
-        }
-        break;
+        return this.isValidRookMove(sourceRow, sourceCol, targetRow, targetCol);
+      case '♘':
+      case '♞':
+        return this.isValidKnightMove(sourceRow, sourceCol, targetRow, targetCol);
       case '♗':
       case '♝':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          if (this.getBishopMoves(sourceCell).includes(targetCell.position)) {
-            return true;
-          }
-        } else if (targetPiece === '' && this.getBishopMoves(sourceCell).includes(targetCell.position)) {
-          return true;
-        }
-        break;
+        return this.isValidBishopMove(sourceRow, sourceCol, targetRow, targetCol);
       case '♕':
       case '♛':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          if (this.getRookMoves(sourceCell).includes(targetCell.position) || this.getBishopMoves(sourceCell).includes(targetCell.position)) {
-            return true;
-          }
-        } else if (targetPiece === '' && (this.getRookMoves(sourceCell).includes(targetCell.position) || this.getBishopMoves(sourceCell).includes(targetCell.position))) {
-          return true;
-        }
-        break;
+        return this.isValidQueenMove(sourceRow, sourceCol, targetRow, targetCol);
       case '♔':
       case '♚':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          const colDiff = Math.abs(sourceCell.position % 8 - targetCell.position % 8);
-          const rowDiff = Math.abs(Math.floor(sourceCell.position / 8) - Math.floor(targetCell.position / 8));
-          if (colDiff <= 1 && rowDiff <= 1) {
-            return true;
-          }
-        } else if (targetPiece === '' && (this.getRookMoves(sourceCell).includes(targetCell.position) || this.getBishopMoves(sourceCell).includes(targetCell.position))) {
-          const colDiff = Math.abs(sourceCell.position % 8 - targetCell.position % 8);
-          const rowDiff = Math.abs(Math.floor(sourceCell.position / 8) - Math.floor(targetCell.position / 8));
-          if (colDiff <= 1 && rowDiff <= 1) {
-            return true;
-          }
-        }
-        break;
-      case '♞':
-      case '♘':
-        if (isCapture && targetPiece !== '' && this.getCellPieceColor(sourceCell) !== this.getCellPieceColor(targetCell)) {
-          const colDiff = Math.abs(sourceCell.position % 8 - targetCell.position % 8);
-          const rowDiff = Math.abs(Math.floor(sourceCell.position / 8) - Math.floor(targetCell.position / 8));
-          if ((colDiff === 2 && rowDiff === 1) || (colDiff === 1 && rowDiff === 2)) {
-            return true;
-          }
-        } else if (targetPiece === '' && (this.getKnightMoves(sourceCell).includes(targetCell.position))) {
-          const colDiff = Math.abs(sourceCell.position % 8 - targetCell.position % 8);
-          const rowDiff = Math.abs(Math.floor(sourceCell.position / 8) - Math.floor(targetCell.position / 8));
-          if ((colDiff === 2 && rowDiff === 1) || (colDiff === 1 && rowDiff === 2)) {
-            return true;
-          }
-        }
-        break;
+        return this.isValidKingMove(sourceRow, sourceCol, targetRow, targetCol);
       default:
-        break;
+        return false;
+    }
+  }
+
+  isValidPawnMove(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number, isWhitePiece: boolean, targetPiece: string): boolean {
+    const direction = isWhitePiece ? -1 : 1;
+    const startRow = isWhitePiece ? 6 : 1;
+
+    if (sourceCol === targetCol) {
+      if (targetPiece !== '') return false;
+      if (sourceRow + direction === targetRow) return true;
+      if (sourceRow === startRow && sourceRow + 2 * direction === targetRow) return true;
+    } else if (Math.abs(sourceCol - targetCol) === 1 && sourceRow + direction === targetRow) {
+      return targetPiece !== '';
     }
 
     return false;
+  }
+
+  isValidRookMove(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number): boolean {
+    if (sourceRow !== targetRow && sourceCol !== targetCol) return false;
+    return this.isPathClear(sourceRow, sourceCol, targetRow, targetCol);
+  }
+
+  isValidKnightMove(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number): boolean {
+    const rowDiff = Math.abs(sourceRow - targetRow);
+    const colDiff = Math.abs(sourceCol - targetCol);
+    return (rowDiff === 2 && colDiff === 1) || (rowDiff === 1 && colDiff === 2);
+  }
+
+  isValidBishopMove(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number): boolean {
+    if (Math.abs(sourceRow - targetRow) !== Math.abs(sourceCol - targetCol)) return false;
+    return this.isPathClear(sourceRow, sourceCol, targetRow, targetCol);
+  }
+
+  isValidQueenMove(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number): boolean {
+    if (sourceRow !== targetRow && sourceCol !== targetCol && Math.abs(sourceRow - targetRow) !== Math.abs(sourceCol - targetCol)) return false;
+    return this.isPathClear(sourceRow, sourceCol, targetRow, targetCol);
+  }
+
+  isValidKingMove(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number): boolean {
+    const rowDiff = Math.abs(sourceRow - targetRow);
+    const colDiff = Math.abs(sourceCol - targetCol);
+    return rowDiff <= 1 && colDiff <= 1;
+  }
+
+  isPathClear(sourceRow: number, sourceCol: number, targetRow: number, targetCol: number): boolean {
+    const rowStep = targetRow > sourceRow ? 1 : -1;
+    const colStep = targetCol > sourceCol ? 1 : -1;
+
+    if (sourceRow === targetRow) {
+      for (let col = sourceCol + colStep; col !== targetCol; col += colStep) {
+        if (this.chessBoard[sourceRow * 8 + col].piece !== '') return false;
+      }
+    } else if (sourceCol === targetCol) {
+      for (let row = sourceRow + rowStep; row !== targetRow; row += rowStep) {
+        if (this.chessBoard[row * 8 + sourceCol].piece !== '') return false;
+      }
+    } else {
+      for (let row = sourceRow + rowStep, col = sourceCol + colStep; row !== targetRow; row += rowStep, col += colStep) {
+        if (this.chessBoard[row * 8 + col].piece !== '') return false;
+      }
+    }
+
+    return true;
   }
 
   movePiece(sourceCell: ChessCell, targetCell: ChessCell) {
@@ -363,36 +206,83 @@ export class DndchessComponent{
     }
   }
 
-  startDrag(event: DragEvent, cell: ChessCell) {
-    if (cell.piece !== '') {
-      this.selectedCell = cell;
-      event.dataTransfer!.setData('text/plain', '');
-    }
+  checkForCheck() {
+    this.isCheck = this.isUnderAttack(this.kingPosition);
   }
 
-  dragOver(event: DragEvent) {
-    event.preventDefault();
+  findKingPosition(): number {
+    const king = this.currentPlayer === 'white' ? '♔' : '♚';
+    return this.chessBoard.findIndex(cell => cell.piece === king);
   }
 
-  drop(event: DragEvent, targetCell: ChessCell) {
-    event.preventDefault();
-    if (this.selectedCell) {
-      if (this.isValidMove(this.selectedCell, targetCell)) {
-        this.movePiece(this.selectedCell, targetCell);
+  isUnderAttack(position: number): boolean {
+    const row = Math.floor(position / 8);
+    const col = position % 8;
+
+    for (let i = 0; i < 64; i++) {
+      const cell = this.chessBoard[i];
+      if (cell.piece !== '' && !this.isCurrentPlayerPiece(cell)) {
+        if (this.isValidMove(cell, { piece: '', position: position, color: '' })) {
+          return true;
+        }
       }
     }
+
+    return false;
   }
-}
-interface ChessPiece {
-  name: string;
-  symbol: string;
-  color: string;
-  health: number;
+
+  isMoveResolvingCheck(targetCell: ChessCell): boolean {
+    if (!this.selectedCell) return false;
+
+    const tempBoard = JSON.parse(JSON.stringify(this.chessBoard)); // Копируем доску
+    const sourceIndex = this.selectedCell.position;
+    const targetIndex = targetCell.position;
+
+    // Делаем временный ход
+    tempBoard[targetIndex].piece = tempBoard[sourceIndex].piece;
+    tempBoard[sourceIndex].piece = '';
+
+    // Проверяем, остался ли король под шахом
+    const kingPosition = this.findKingPosition();
+    const isStillInCheck = this.isUnderAttack(kingPosition);
+
+    return !isStillInCheck;
+  }
+
+  getPossibleMoves(cell: ChessCell): number[] {
+    const moves: number[] = [];
+    for (let i = 0; i < 64; i++) {
+      const targetCell = this.chessBoard[i];
+      if (this.isValidMove(cell, targetCell)) {
+        moves.push(i);
+      }
+    }
+    return moves;
+  }
+
+  // Drag-and-drop методы
+  onDragStart(cell: ChessCell) {
+    if (cell.piece !== '' && this.isCurrentPlayerPiece(cell)) {
+      this.dragStartCell = cell;
+    }
+  }
+
+  onDragOver(event: DragEvent) {
+    event.preventDefault(); // Разрешаем drop
+  }
+
+  onDrop(cell: ChessCell) {
+    if (this.dragStartCell && this.isValidMove(this.dragStartCell, cell)) {
+      this.movePiece(this.dragStartCell, cell);
+      this.currentPlayer = this.currentPlayer === 'white' ? 'black' : 'white';
+      this.checkForCheck();
+      this.kingPosition = this.findKingPosition();
+    }
+    this.dragStartCell = null;
+  }
 }
 
 interface ChessCell {
-  name: string;
-  symbol: string;
   piece: string;
   position: number;
   color: string;

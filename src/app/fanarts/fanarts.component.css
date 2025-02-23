@@ -43,7 +43,12 @@
 .gallery-heading {
   text-transform: uppercase;
   font-size: 36px;
+  margin-bottom: 10px;
+}
+.gallery-heading1 {
+  font-size: 36px;
   margin-bottom: 90px;
+  margin-left: -12px;
 }
 
 .tabs {

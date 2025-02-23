@@ -22,11 +22,8 @@ export class FanartsComponent {
     { title: 'Кавех', imageUrl: '/assets/images/kaveh.jpg' },
     { title: 'Дебора мейби твоя мать', imageUrl: '/assets/images/os.jpg' },
     { title: 'Кафка', imageUrl: '/assets/images/kafka.jpg' },
-    // добавьте другие фанарты
   ];
   viewDetails(item: any) {
-    // перейти на другую страницу для просмотра подробностей
-    // можно использовать роутинг Angular для передачи данных на другую страницу
     console.log("Просмотр подробностей: ", item);
   }
   changeTab(tabNumber: number) {
