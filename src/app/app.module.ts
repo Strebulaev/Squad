@@ -57,8 +57,8 @@ import { IntroComponent } from './intro/intro.component';
     FormsModule,
     AppRoutingModule,
     RouterModule.forRoot([
-      { path: '', redirectTo: '/home/home', pathMatch: 'full' },
-      { path: 'home', component: HomeComponent},
+      { path: 'home', redirectTo: '/home/home', pathMatch: 'full' },
+      { path: 'home/home', component: HomeComponent},
       { path: 'ilusha', component: IlushaComponent },
       { path: 'arsusha', component: ArsushaComponent },
       { path: 'login', component: LoginComponent },
@@ -77,9 +77,8 @@ import { IntroComponent } from './intro/intro.component';
       { path: 'chat', component: ChatComponent },
       { path: 'library', component: LibraryComponent },
       { path: 'intro', component: IntroComponent },
-      { path: 'home', redirectTo: '/home/home', pathMatch: 'full' },
       { path: '**', redirectTo: '/home/home' }
-
+ 
     ]),
   ],
   providers: [

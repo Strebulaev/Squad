@@ -1,4 +1,5 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Router } from '@angular/router'; // Импортируйте Router
 
 @Component({
   selector: 'app-intro',
@@ -10,9 +11,11 @@ export class IntroComponent {
   isVideoPlaying: boolean = false;
   @ViewChild('introVideo') introVideo!: ElementRef<HTMLVideoElement>;
 
+  constructor(private router: Router) { } // Добавьте Router в конструктор
+
   // Запуск видео
   startVideo(): void {
-    this.isVideoPlaying = true; // Показываем видео
+    this.isVideoPlaying = true;
     setTimeout(() => {
       if (this.introVideo && this.introVideo.nativeElement) {
         this.introVideo.nativeElement.play();
@@ -22,6 +25,7 @@ export class IntroComponent {
 
   // Обработчик завершения видео
   onVideoEnd(): void {
-    this.showIntro = false; // Скрываем заставку и показываем основной контент
+    this.showIntro = false; // Скрываем заставку
+    this.router.navigate(['/home/home']);
   }
 }
