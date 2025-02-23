@@ -77,7 +77,9 @@ import { IntroComponent } from './intro/intro.component';
       { path: 'chat', component: ChatComponent },
       { path: 'library', component: LibraryComponent },
       { path: 'intro', component: IntroComponent },
-      { path: '', redirectTo: '/home', pathMatch: 'full' }
+      { path: 'home', redirectTo: '/home/home', pathMatch: 'full' },
+      { path: '**', redirectTo: '/intro' }
+
     ]),
   ],
   providers: [
