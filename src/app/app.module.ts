@@ -57,8 +57,7 @@ import { IntroComponent } from './intro/intro.component';
     FormsModule,
     AppRoutingModule,
     RouterModule.forRoot([
-      { path: '', component: HomeComponent, pathMatch: 'full' },
-      { path: 'home', component: HomeComponent },
+      { path: 'home', component: HomeComponent, pathMatch: 'full' },
       { path: 'ilusha', component: IlushaComponent },
       { path: 'arsusha', component: ArsushaComponent },
       { path: 'login', component: LoginComponent },
