@@ -1,0 +1,37 @@
+.intro-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.enter-button {
+  padding: 15px 30px;
+  font-size: 30px;
+  font-weight: Medium;
+  color: black;
+  background-color: #fe9000;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+  .enter-button:hover {
+    background-color: #fe9000;
+  }
+
+.intro-video {
+  width: 100%;
+  height: 100vh;
+  object-fit: cover; 
+}
+
+.text{
+    font-size: 47px;
+}
