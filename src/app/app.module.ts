@@ -26,6 +26,7 @@ import { TetrisComponent } from './tetris/tetris.component';
 import { ChatComponent } from './chat/chat.component';
 import { LibraryComponent } from './library/library.component';
 import { IntroComponent } from './intro/intro.component';
+import { CrazyTimerComponent } from './crazy-timer/crazy-timer.component';
 
 @NgModule({
   declarations: [
@@ -49,6 +50,7 @@ import { IntroComponent } from './intro/intro.component';
     LibraryComponent,
     IntroComponent,
 
+
   ],
   imports: [     
     CommonModule,
@@ -56,6 +58,7 @@ import { IntroComponent } from './intro/intro.component';
     BrowserAnimationsModule,
     FormsModule,
     AppRoutingModule,
+    CrazyTimerComponent,
     RouterModule.forRoot([
       { path: 'home', redirectTo: '/home/home', pathMatch: 'full' },
       { path: 'home/home', component: HomeComponent},
@@ -77,7 +80,8 @@ import { IntroComponent } from './intro/intro.component';
       { path: 'chat', component: ChatComponent },
       { path: 'library', component: LibraryComponent },
       { path: 'intro', component: IntroComponent },
-      { path: '**', redirectTo: '/home/home' }
+      { path: 'crazy-timer', component: CrazyTimerComponent },
+      { path: '**', redirectTo: '' }
  
     ]),
   ],

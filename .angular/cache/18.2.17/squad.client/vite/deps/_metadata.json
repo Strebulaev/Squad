@@ -1,0 +1,82 @@
+{
+  "hash": "8ab615c4",
+  "configHash": "7ae2b39a",
+  "lockfileHash": "f4924372",
+  "browserHash": "c3908471",
+  "optimized": {
+    "@angular/animations": {
+      "src": "../../../../../../node_modules/@angular/animations/fesm2022/animations.mjs",
+      "file": "@angular_animations.js",
+      "fileHash": "158caeb8",
+      "needsInterop": false
+    },
+    "@angular/common": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/common.mjs",
+      "file": "@angular_common.js",
+      "fileHash": "6937a44f",
+      "needsInterop": false
+    },
+    "@angular/common/http": {
+      "src": "../../../../../../node_modules/@angular/common/fesm2022/http.mjs",
+      "file": "@angular_common_http.js",
+      "fileHash": "74c2b36f",
+      "needsInterop": false
+    },
+    "@angular/core": {
+      "src": "../../../../../../node_modules/@angular/core/fesm2022/core.mjs",
+      "file": "@angular_core.js",
+      "fileHash": "b476c460",
+      "needsInterop": false
+    },
+    "@angular/forms": {
+      "src": "../../../../../../node_modules/@angular/forms/fesm2022/forms.mjs",
+      "file": "@angular_forms.js",
+      "fileHash": "1662bb45",
+      "needsInterop": false
+    },
+    "@angular/platform-browser": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs",
+      "file": "@angular_platform-browser.js",
+      "fileHash": "a0131de7",
+      "needsInterop": false
+    },
+    "@angular/platform-browser/animations": {
+      "src": "../../../../../../node_modules/@angular/platform-browser/fesm2022/animations.mjs",
+      "file": "@angular_platform-browser_animations.js",
+      "fileHash": "c9b02268",
+      "needsInterop": false
+    },
+    "@angular/router": {
+      "src": "../../../../../../node_modules/@angular/router/fesm2022/router.mjs",
+      "file": "@angular_router.js",
+      "fileHash": "0090cdc1",
+      "needsInterop": false
+    },
+    "axios": {
+      "src": "../../../../../../node_modules/axios/index.js",
+      "file": "axios.js",
+      "fileHash": "8fc217f0",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-FFXGAZYR": {
+      "file": "chunk-FFXGAZYR.js"
+    },
+    "chunk-3SKBAALV": {
+      "file": "chunk-3SKBAALV.js"
+    },
+    "chunk-AYS3NVXE": {
+      "file": "chunk-AYS3NVXE.js"
+    },
+    "chunk-BSOZU3IN": {
+      "file": "chunk-BSOZU3IN.js"
+    },
+    "chunk-UM4RL7GU": {
+      "file": "chunk-UM4RL7GU.js"
+    },
+    "chunk-4ULMLRGT": {
+      "file": "chunk-4ULMLRGT.js"
+    }
+  }
+}

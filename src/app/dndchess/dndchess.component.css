@@ -180,13 +180,17 @@ title {
   background-repeat: no-repeat;
   background-size: contain;
 }
+/* Подсветка возможных ходов */
 .possible-move {
   background-color: rgba(0, 255, 0, 0.3) !important;
 }
 
+/* Подсветка шаха */
 .check {
   background-color: rgba(255, 0, 0, 0.5) !important;
 }
+
+/* Остальные стили оставьте такими же, как в предыдущем коде. */
 .pointLeft {
   position: absolute;
   top: 66%;
