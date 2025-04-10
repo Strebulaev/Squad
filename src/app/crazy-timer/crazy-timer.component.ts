@@ -136,7 +136,13 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     const urlParams = new URLSearchParams(window.location.search);
     this.isAdmin = urlParams.has('admin');
   }
+  isPending(timerId: number): boolean {
+    return this.pendingTimers.some(t => t.id === timerId);
+  }
 
+  isApproved(timerId: number): boolean {
+    return this.completedTimers.some(t => t.id === timerId && t.isApproved);
+  }
   private loadCookies(): void {
     const savedCookies = localStorage.getItem('crazy-cookies');
     this.cookies = savedCookies ? parseInt(savedCookies) : 0;
@@ -167,7 +173,27 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
       error: (err) => console.error('Ошибка отправки:', err)
     });
   }
+  private checkTelegramUpdates() {
+    setInterval(async () => {
+      if (this.pendingTimers.length > 0) {
+        const timerIds = this.pendingTimers.map(t => t.id);
+        try {
+          const response = await fetch(`/api/get-updates?ids=${timerIds.join(',')}`);
+          const updates = await response.json();
 
+          updates.forEach((update: any) => {
+            if (update.status === 'approved') {
+              this.approveTask(update.timerId);
+            } else if (update.status === 'rejected') {
+              this.rejectTask(update.timerId);
+            }
+          });
+        } catch (error) {
+          console.error('Update check failed:', error);
+        }
+      }
+    }, 5000); // Проверка каждые 5 секунд
+  }
   addTimer(form: NgForm): void {
     if (!this.validateInput(form)) return;
 
@@ -438,6 +464,9 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
   getRandomValue(min: number, max: number): number {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
+  getRandomTransform(): string {
+  return `rotate(${this.getRandomValue(-1, 1)}deg)`; // Уменьшил диапазон вращения
+}
 
   trackById(index: number, item: Timer): number {
     return item.id;

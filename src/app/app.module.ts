@@ -49,8 +49,6 @@ import { CrazyTimerComponent } from './crazy-timer/crazy-timer.component';
     ChatComponent,
     LibraryComponent,
     IntroComponent,
-
-
   ],
   imports: [     
     CommonModule,

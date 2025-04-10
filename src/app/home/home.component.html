@@ -13,12 +13,13 @@
       <img src="/assets/images/Squad.png" alt="Squad">
     </h2>
   </div>
-  <button *ngIf="!isAuthenticated" (click)="signIn()">Войти</button>
+  <button *ngIf="!isAuthenticated" (click)="signIn()">Sign in</button>
   <ng-container *ngIf="isAuthenticated">
     <pre>{{ userData | json }}</pre>
-    <p>Токен доступа: {{ accessToken }}</p>
+    <p>ID token: {{ idToken }}</p>
+    <p>Access token: {{ accessToken }}</p>
     <!-- ... -->
-    <button (click)="signOut()">Выйти</button>
+    <button (click)="signOut()">Sign out</button>
   </ng-container>
 </body>
 <style>

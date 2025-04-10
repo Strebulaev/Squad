@@ -45,7 +45,10 @@
             <h3>{{ timer.task }}</h3>
             <span class="status-badge pending">⏳ Ожидает подтверждения</span>
           </header>
-
+          <div *ngFor="let timer of pendingTimers" class="pending-timer">
+            <h3>{{ timer.task }}</h3>
+            <div>Статус: ⏳ Ожидает проверки (ID: {{ timer.id }})</div>
+          </div>
           <div class="timer-body">
             <div class="time-display">
               <span class="time-left">⏳ {{ timer.formattedTime }}</span>
@@ -133,10 +136,7 @@
         <h2 class="section-title">Активные задания ({{ activeTimers.length }})</h2>
 
         <div class="timers-grid">
-          <article *ngFor="let timer of activeTimers; trackBy: trackById"
-                   class="timer-card"
-                   [ngStyle]="timer.elementStyle"
-                   [class.expiring]="timer.timeLeft < 30">
+          <article *ngFor="let timer of activeTimers; trackBy: trackById" class="timer-card">
             <header class="timer-header">
               <h3>{{ timer.task }}</h3>
               <span *ngIf="timer.isPending" class="status-badge pending">⏳ На проверке</span>
@@ -155,23 +155,16 @@
                 Сложность: <span>{{ timer.difficulty }}</span>🍪
               </div>
             </div>
-            <div *ngIf="timer.isPending" class="status-badge pending">
-              ⏳ Ожидает проверки ({{ timer.id }})
+            <div *ngIf="isPending(timer.id)" class="status-badge pending">
+              ⏳ Ожидает проверки
+            </div>
+            <div *ngIf="isApproved(timer.id)" class="status-badge approved">
+              ✅ Подтверждено
             </div>
             <footer class="timer-footer">
-              <button *ngIf="!timer.isPending && !timer.isApproved"
-                      (click)="completeTimer(timer.id)"
-                      class="complete-button clown-button">
+              <button (click)="completeTimer(timer.id)" class="complete-button clown-button">
                 ✅ Завершить
               </button>
-              <div *ngIf="isAdmin && timer.isPending" class="admin-controls">
-                <button (click)="approveTask(timer.id)" class="btn-approve">
-                  ✅ Подтвердить
-                </button>
-                <button (click)="rejectTask(timer.id)" class="btn-reject">
-                  ❌ Отклонить
-                </button>
-              </div>
             </footer>
           </article>
         </div>
@@ -182,13 +175,12 @@
         <h2 class="section-title">Выполненные задания ({{ completedTimers.length }})</h2>
 
         <div class="completed-list">
-          <div *ngFor="let timer of completedTimers" class="completed-item">
-            <span class="completed-icon">✅</span>
-            <span class="completed-task">{{ timer.task }}</span>
-            <span class="completed-cookies">+{{ timer.difficulty }}🍪</span>
+          <div *ngFor="let timer of completedTimers" class="completed-timer">
+            <h3>{{ timer.task }}</h3>
+            <div>Статус: ✅ Подтверждено (ID: {{ timer.id }})</div>
           </div>
         </div>
-        <div *ngIf="timer.isApproved" class="status-badge approved">
+        <div *ngIf="isApproved(timer.id)" class="status-badge approved">
           ✅ Подтверждено ({{ timer.id }})
         </div>
       </section>
