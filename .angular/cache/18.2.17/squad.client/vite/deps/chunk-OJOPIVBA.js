@@ -1,26 +1,12 @@
 import {
-  Observable,
+  BehaviorSubject,
+  first,
+  map
+} from "./chunk-SLOEJEKW.js";
+import {
   Subject,
-  Subscriber,
-  Subscription,
-  __asyncGenerator,
-  __asyncValues,
-  __await,
-  __awaiter,
-  __extends,
-  __generator,
-  __read,
-  __spreadArray,
-  __values,
-  arrRemove,
-  createErrorClass,
-  dateTimestampProvider,
-  identity,
-  isFunction,
-  noop,
-  observable,
-  reportUnhandledError
-} from "./chunk-X2J6GGPQ.js";
+  Subscription
+} from "./chunk-BBEFCJEL.js";
 import {
   __spreadProps,
   __spreadValues
@@ -390,2133 +376,6 @@ var WATCH_NODE = (() => {
     cleanupFn: NOOP_CLEANUP_FN
   });
 })();
-
-// node_modules/rxjs/dist/esm5/internal/util/lift.js
-function hasLift(source) {
-  return isFunction(source === null || source === void 0 ? void 0 : source.lift);
-}
-function operate(init) {
-  return function(source) {
-    if (hasLift(source)) {
-      return source.lift(function(liftedSource) {
-        try {
-          return init(liftedSource, this);
-        } catch (err) {
-          this.error(err);
-        }
-      });
-    }
-    throw new TypeError("Unable to lift unknown Observable type");
-  };
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js
-function createOperatorSubscriber(destination, onNext, onComplete, onError, onFinalize) {
-  return new OperatorSubscriber(destination, onNext, onComplete, onError, onFinalize);
-}
-var OperatorSubscriber = function(_super) {
-  __extends(OperatorSubscriber2, _super);
-  function OperatorSubscriber2(destination, onNext, onComplete, onError, onFinalize, shouldUnsubscribe) {
-    var _this = _super.call(this, destination) || this;
-    _this.onFinalize = onFinalize;
-    _this.shouldUnsubscribe = shouldUnsubscribe;
-    _this._next = onNext ? function(value) {
-      try {
-        onNext(value);
-      } catch (err) {
-        destination.error(err);
-      }
-    } : _super.prototype._next;
-    _this._error = onError ? function(err) {
-      try {
-        onError(err);
-      } catch (err2) {
-        destination.error(err2);
-      } finally {
-        this.unsubscribe();
-      }
-    } : _super.prototype._error;
-    _this._complete = onComplete ? function() {
-      try {
-        onComplete();
-      } catch (err) {
-        destination.error(err);
-      } finally {
-        this.unsubscribe();
-      }
-    } : _super.prototype._complete;
-    return _this;
-  }
-  OperatorSubscriber2.prototype.unsubscribe = function() {
-    var _a;
-    if (!this.shouldUnsubscribe || this.shouldUnsubscribe()) {
-      var closed_1 = this.closed;
-      _super.prototype.unsubscribe.call(this);
-      !closed_1 && ((_a = this.onFinalize) === null || _a === void 0 ? void 0 : _a.call(this));
-    }
-  };
-  return OperatorSubscriber2;
-}(Subscriber);
-
-// node_modules/rxjs/dist/esm5/internal/operators/refCount.js
-function refCount() {
-  return operate(function(source, subscriber) {
-    var connection = null;
-    source._refCount++;
-    var refCounter = createOperatorSubscriber(subscriber, void 0, void 0, void 0, function() {
-      if (!source || source._refCount <= 0 || 0 < --source._refCount) {
-        connection = null;
-        return;
-      }
-      var sharedConnection = source._connection;
-      var conn = connection;
-      connection = null;
-      if (sharedConnection && (!conn || sharedConnection === conn)) {
-        sharedConnection.unsubscribe();
-      }
-      subscriber.unsubscribe();
-    });
-    source.subscribe(refCounter);
-    if (!refCounter.closed) {
-      connection = source.connect();
-    }
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/ConnectableObservable.js
-var ConnectableObservable = function(_super) {
-  __extends(ConnectableObservable2, _super);
-  function ConnectableObservable2(source, subjectFactory) {
-    var _this = _super.call(this) || this;
-    _this.source = source;
-    _this.subjectFactory = subjectFactory;
-    _this._subject = null;
-    _this._refCount = 0;
-    _this._connection = null;
-    if (hasLift(source)) {
-      _this.lift = source.lift;
-    }
-    return _this;
-  }
-  ConnectableObservable2.prototype._subscribe = function(subscriber) {
-    return this.getSubject().subscribe(subscriber);
-  };
-  ConnectableObservable2.prototype.getSubject = function() {
-    var subject = this._subject;
-    if (!subject || subject.isStopped) {
-      this._subject = this.subjectFactory();
-    }
-    return this._subject;
-  };
-  ConnectableObservable2.prototype._teardown = function() {
-    this._refCount = 0;
-    var _connection = this._connection;
-    this._subject = this._connection = null;
-    _connection === null || _connection === void 0 ? void 0 : _connection.unsubscribe();
-  };
-  ConnectableObservable2.prototype.connect = function() {
-    var _this = this;
-    var connection = this._connection;
-    if (!connection) {
-      connection = this._connection = new Subscription();
-      var subject_1 = this.getSubject();
-      connection.add(this.source.subscribe(createOperatorSubscriber(subject_1, void 0, function() {
-        _this._teardown();
-        subject_1.complete();
-      }, function(err) {
-        _this._teardown();
-        subject_1.error(err);
-      }, function() {
-        return _this._teardown();
-      })));
-      if (connection.closed) {
-        this._connection = null;
-        connection = Subscription.EMPTY;
-      }
-    }
-    return connection;
-  };
-  ConnectableObservable2.prototype.refCount = function() {
-    return refCount()(this);
-  };
-  return ConnectableObservable2;
-}(Observable);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/performanceTimestampProvider.js
-var performanceTimestampProvider = {
-  now: function() {
-    return (performanceTimestampProvider.delegate || performance).now();
-  },
-  delegate: void 0
-};
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/animationFrameProvider.js
-var animationFrameProvider = {
-  schedule: function(callback) {
-    var request = requestAnimationFrame;
-    var cancel = cancelAnimationFrame;
-    var delegate = animationFrameProvider.delegate;
-    if (delegate) {
-      request = delegate.requestAnimationFrame;
-      cancel = delegate.cancelAnimationFrame;
-    }
-    var handle = request(function(timestamp2) {
-      cancel = void 0;
-      callback(timestamp2);
-    });
-    return new Subscription(function() {
-      return cancel === null || cancel === void 0 ? void 0 : cancel(handle);
-    });
-  },
-  requestAnimationFrame: function() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      args[_i] = arguments[_i];
-    }
-    var delegate = animationFrameProvider.delegate;
-    return ((delegate === null || delegate === void 0 ? void 0 : delegate.requestAnimationFrame) || requestAnimationFrame).apply(void 0, __spreadArray([], __read(args)));
-  },
-  cancelAnimationFrame: function() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      args[_i] = arguments[_i];
-    }
-    var delegate = animationFrameProvider.delegate;
-    return ((delegate === null || delegate === void 0 ? void 0 : delegate.cancelAnimationFrame) || cancelAnimationFrame).apply(void 0, __spreadArray([], __read(args)));
-  },
-  delegate: void 0
-};
-
-// node_modules/rxjs/dist/esm5/internal/observable/dom/animationFrames.js
-function animationFramesFactory(timestampProvider) {
-  return new Observable(function(subscriber) {
-    var provider = timestampProvider || performanceTimestampProvider;
-    var start = provider.now();
-    var id = 0;
-    var run = function() {
-      if (!subscriber.closed) {
-        id = animationFrameProvider.requestAnimationFrame(function(timestamp2) {
-          id = 0;
-          var now = provider.now();
-          subscriber.next({
-            timestamp: timestampProvider ? now : timestamp2,
-            elapsed: now - start
-          });
-          run();
-        });
-      }
-    };
-    run();
-    return function() {
-      if (id) {
-        animationFrameProvider.cancelAnimationFrame(id);
-      }
-    };
-  });
-}
-var DEFAULT_ANIMATION_FRAMES = animationFramesFactory();
-
-// node_modules/rxjs/dist/esm5/internal/BehaviorSubject.js
-var BehaviorSubject = function(_super) {
-  __extends(BehaviorSubject2, _super);
-  function BehaviorSubject2(_value) {
-    var _this = _super.call(this) || this;
-    _this._value = _value;
-    return _this;
-  }
-  Object.defineProperty(BehaviorSubject2.prototype, "value", {
-    get: function() {
-      return this.getValue();
-    },
-    enumerable: false,
-    configurable: true
-  });
-  BehaviorSubject2.prototype._subscribe = function(subscriber) {
-    var subscription = _super.prototype._subscribe.call(this, subscriber);
-    !subscription.closed && subscriber.next(this._value);
-    return subscription;
-  };
-  BehaviorSubject2.prototype.getValue = function() {
-    var _a = this, hasError = _a.hasError, thrownError = _a.thrownError, _value = _a._value;
-    if (hasError) {
-      throw thrownError;
-    }
-    this._throwIfClosed();
-    return _value;
-  };
-  BehaviorSubject2.prototype.next = function(value) {
-    _super.prototype.next.call(this, this._value = value);
-  };
-  return BehaviorSubject2;
-}(Subject);
-
-// node_modules/rxjs/dist/esm5/internal/AsyncSubject.js
-var AsyncSubject = function(_super) {
-  __extends(AsyncSubject2, _super);
-  function AsyncSubject2() {
-    var _this = _super !== null && _super.apply(this, arguments) || this;
-    _this._value = null;
-    _this._hasValue = false;
-    _this._isComplete = false;
-    return _this;
-  }
-  AsyncSubject2.prototype._checkFinalizedStatuses = function(subscriber) {
-    var _a = this, hasError = _a.hasError, _hasValue = _a._hasValue, _value = _a._value, thrownError = _a.thrownError, isStopped = _a.isStopped, _isComplete = _a._isComplete;
-    if (hasError) {
-      subscriber.error(thrownError);
-    } else if (isStopped || _isComplete) {
-      _hasValue && subscriber.next(_value);
-      subscriber.complete();
-    }
-  };
-  AsyncSubject2.prototype.next = function(value) {
-    if (!this.isStopped) {
-      this._value = value;
-      this._hasValue = true;
-    }
-  };
-  AsyncSubject2.prototype.complete = function() {
-    var _a = this, _hasValue = _a._hasValue, _value = _a._value, _isComplete = _a._isComplete;
-    if (!_isComplete) {
-      this._isComplete = true;
-      _hasValue && _super.prototype.next.call(this, _value);
-      _super.prototype.complete.call(this);
-    }
-  };
-  return AsyncSubject2;
-}(Subject);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/Action.js
-var Action = function(_super) {
-  __extends(Action2, _super);
-  function Action2(scheduler, work) {
-    return _super.call(this) || this;
-  }
-  Action2.prototype.schedule = function(state, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    return this;
-  };
-  return Action2;
-}(Subscription);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/intervalProvider.js
-var intervalProvider = {
-  setInterval: function(handler, timeout2) {
-    var args = [];
-    for (var _i = 2; _i < arguments.length; _i++) {
-      args[_i - 2] = arguments[_i];
-    }
-    var delegate = intervalProvider.delegate;
-    if (delegate === null || delegate === void 0 ? void 0 : delegate.setInterval) {
-      return delegate.setInterval.apply(delegate, __spreadArray([handler, timeout2], __read(args)));
-    }
-    return setInterval.apply(void 0, __spreadArray([handler, timeout2], __read(args)));
-  },
-  clearInterval: function(handle) {
-    var delegate = intervalProvider.delegate;
-    return ((delegate === null || delegate === void 0 ? void 0 : delegate.clearInterval) || clearInterval)(handle);
-  },
-  delegate: void 0
-};
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/AsyncAction.js
-var AsyncAction = function(_super) {
-  __extends(AsyncAction2, _super);
-  function AsyncAction2(scheduler, work) {
-    var _this = _super.call(this, scheduler, work) || this;
-    _this.scheduler = scheduler;
-    _this.work = work;
-    _this.pending = false;
-    return _this;
-  }
-  AsyncAction2.prototype.schedule = function(state, delay2) {
-    var _a;
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (this.closed) {
-      return this;
-    }
-    this.state = state;
-    var id = this.id;
-    var scheduler = this.scheduler;
-    if (id != null) {
-      this.id = this.recycleAsyncId(scheduler, id, delay2);
-    }
-    this.pending = true;
-    this.delay = delay2;
-    this.id = (_a = this.id) !== null && _a !== void 0 ? _a : this.requestAsyncId(scheduler, this.id, delay2);
-    return this;
-  };
-  AsyncAction2.prototype.requestAsyncId = function(scheduler, _id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    return intervalProvider.setInterval(scheduler.flush.bind(scheduler, this), delay2);
-  };
-  AsyncAction2.prototype.recycleAsyncId = function(_scheduler, id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 != null && this.delay === delay2 && this.pending === false) {
-      return id;
-    }
-    if (id != null) {
-      intervalProvider.clearInterval(id);
-    }
-    return void 0;
-  };
-  AsyncAction2.prototype.execute = function(state, delay2) {
-    if (this.closed) {
-      return new Error("executing a cancelled action");
-    }
-    this.pending = false;
-    var error = this._execute(state, delay2);
-    if (error) {
-      return error;
-    } else if (this.pending === false && this.id != null) {
-      this.id = this.recycleAsyncId(this.scheduler, this.id, null);
-    }
-  };
-  AsyncAction2.prototype._execute = function(state, _delay) {
-    var errored = false;
-    var errorValue;
-    try {
-      this.work(state);
-    } catch (e) {
-      errored = true;
-      errorValue = e ? e : new Error("Scheduled action threw falsy error");
-    }
-    if (errored) {
-      this.unsubscribe();
-      return errorValue;
-    }
-  };
-  AsyncAction2.prototype.unsubscribe = function() {
-    if (!this.closed) {
-      var _a = this, id = _a.id, scheduler = _a.scheduler;
-      var actions = scheduler.actions;
-      this.work = this.state = this.scheduler = null;
-      this.pending = false;
-      arrRemove(actions, this);
-      if (id != null) {
-        this.id = this.recycleAsyncId(scheduler, id, null);
-      }
-      this.delay = null;
-      _super.prototype.unsubscribe.call(this);
-    }
-  };
-  return AsyncAction2;
-}(Action);
-
-// node_modules/rxjs/dist/esm5/internal/util/Immediate.js
-var nextHandle = 1;
-var resolved;
-var activeHandles = {};
-function findAndClearHandle(handle) {
-  if (handle in activeHandles) {
-    delete activeHandles[handle];
-    return true;
-  }
-  return false;
-}
-var Immediate = {
-  setImmediate: function(cb) {
-    var handle = nextHandle++;
-    activeHandles[handle] = true;
-    if (!resolved) {
-      resolved = Promise.resolve();
-    }
-    resolved.then(function() {
-      return findAndClearHandle(handle) && cb();
-    });
-    return handle;
-  },
-  clearImmediate: function(handle) {
-    findAndClearHandle(handle);
-  }
-};
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/immediateProvider.js
-var setImmediate = Immediate.setImmediate;
-var clearImmediate = Immediate.clearImmediate;
-var immediateProvider = {
-  setImmediate: function() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
-      args[_i] = arguments[_i];
-    }
-    var delegate = immediateProvider.delegate;
-    return ((delegate === null || delegate === void 0 ? void 0 : delegate.setImmediate) || setImmediate).apply(void 0, __spreadArray([], __read(args)));
-  },
-  clearImmediate: function(handle) {
-    var delegate = immediateProvider.delegate;
-    return ((delegate === null || delegate === void 0 ? void 0 : delegate.clearImmediate) || clearImmediate)(handle);
-  },
-  delegate: void 0
-};
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/AsapAction.js
-var AsapAction = function(_super) {
-  __extends(AsapAction2, _super);
-  function AsapAction2(scheduler, work) {
-    var _this = _super.call(this, scheduler, work) || this;
-    _this.scheduler = scheduler;
-    _this.work = work;
-    return _this;
-  }
-  AsapAction2.prototype.requestAsyncId = function(scheduler, id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 !== null && delay2 > 0) {
-      return _super.prototype.requestAsyncId.call(this, scheduler, id, delay2);
-    }
-    scheduler.actions.push(this);
-    return scheduler._scheduled || (scheduler._scheduled = immediateProvider.setImmediate(scheduler.flush.bind(scheduler, void 0)));
-  };
-  AsapAction2.prototype.recycleAsyncId = function(scheduler, id, delay2) {
-    var _a;
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 != null ? delay2 > 0 : this.delay > 0) {
-      return _super.prototype.recycleAsyncId.call(this, scheduler, id, delay2);
-    }
-    var actions = scheduler.actions;
-    if (id != null && ((_a = actions[actions.length - 1]) === null || _a === void 0 ? void 0 : _a.id) !== id) {
-      immediateProvider.clearImmediate(id);
-      if (scheduler._scheduled === id) {
-        scheduler._scheduled = void 0;
-      }
-    }
-    return void 0;
-  };
-  return AsapAction2;
-}(AsyncAction);
-
-// node_modules/rxjs/dist/esm5/internal/Scheduler.js
-var Scheduler = function() {
-  function Scheduler2(schedulerActionCtor, now) {
-    if (now === void 0) {
-      now = Scheduler2.now;
-    }
-    this.schedulerActionCtor = schedulerActionCtor;
-    this.now = now;
-  }
-  Scheduler2.prototype.schedule = function(work, delay2, state) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    return new this.schedulerActionCtor(this, work).schedule(state, delay2);
-  };
-  Scheduler2.now = dateTimestampProvider.now;
-  return Scheduler2;
-}();
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/AsyncScheduler.js
-var AsyncScheduler = function(_super) {
-  __extends(AsyncScheduler2, _super);
-  function AsyncScheduler2(SchedulerAction, now) {
-    if (now === void 0) {
-      now = Scheduler.now;
-    }
-    var _this = _super.call(this, SchedulerAction, now) || this;
-    _this.actions = [];
-    _this._active = false;
-    return _this;
-  }
-  AsyncScheduler2.prototype.flush = function(action) {
-    var actions = this.actions;
-    if (this._active) {
-      actions.push(action);
-      return;
-    }
-    var error;
-    this._active = true;
-    do {
-      if (error = action.execute(action.state, action.delay)) {
-        break;
-      }
-    } while (action = actions.shift());
-    this._active = false;
-    if (error) {
-      while (action = actions.shift()) {
-        action.unsubscribe();
-      }
-      throw error;
-    }
-  };
-  return AsyncScheduler2;
-}(Scheduler);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/AsapScheduler.js
-var AsapScheduler = function(_super) {
-  __extends(AsapScheduler2, _super);
-  function AsapScheduler2() {
-    return _super !== null && _super.apply(this, arguments) || this;
-  }
-  AsapScheduler2.prototype.flush = function(action) {
-    this._active = true;
-    var flushId = this._scheduled;
-    this._scheduled = void 0;
-    var actions = this.actions;
-    var error;
-    action = action || actions.shift();
-    do {
-      if (error = action.execute(action.state, action.delay)) {
-        break;
-      }
-    } while ((action = actions[0]) && action.id === flushId && actions.shift());
-    this._active = false;
-    if (error) {
-      while ((action = actions[0]) && action.id === flushId && actions.shift()) {
-        action.unsubscribe();
-      }
-      throw error;
-    }
-  };
-  return AsapScheduler2;
-}(AsyncScheduler);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/asap.js
-var asapScheduler = new AsapScheduler(AsapAction);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/async.js
-var asyncScheduler = new AsyncScheduler(AsyncAction);
-var async = asyncScheduler;
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/QueueAction.js
-var QueueAction = function(_super) {
-  __extends(QueueAction2, _super);
-  function QueueAction2(scheduler, work) {
-    var _this = _super.call(this, scheduler, work) || this;
-    _this.scheduler = scheduler;
-    _this.work = work;
-    return _this;
-  }
-  QueueAction2.prototype.schedule = function(state, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 > 0) {
-      return _super.prototype.schedule.call(this, state, delay2);
-    }
-    this.delay = delay2;
-    this.state = state;
-    this.scheduler.flush(this);
-    return this;
-  };
-  QueueAction2.prototype.execute = function(state, delay2) {
-    return delay2 > 0 || this.closed ? _super.prototype.execute.call(this, state, delay2) : this._execute(state, delay2);
-  };
-  QueueAction2.prototype.requestAsyncId = function(scheduler, id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 != null && delay2 > 0 || delay2 == null && this.delay > 0) {
-      return _super.prototype.requestAsyncId.call(this, scheduler, id, delay2);
-    }
-    scheduler.flush(this);
-    return 0;
-  };
-  return QueueAction2;
-}(AsyncAction);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/QueueScheduler.js
-var QueueScheduler = function(_super) {
-  __extends(QueueScheduler2, _super);
-  function QueueScheduler2() {
-    return _super !== null && _super.apply(this, arguments) || this;
-  }
-  return QueueScheduler2;
-}(AsyncScheduler);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/queue.js
-var queueScheduler = new QueueScheduler(QueueAction);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/AnimationFrameAction.js
-var AnimationFrameAction = function(_super) {
-  __extends(AnimationFrameAction2, _super);
-  function AnimationFrameAction2(scheduler, work) {
-    var _this = _super.call(this, scheduler, work) || this;
-    _this.scheduler = scheduler;
-    _this.work = work;
-    return _this;
-  }
-  AnimationFrameAction2.prototype.requestAsyncId = function(scheduler, id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 !== null && delay2 > 0) {
-      return _super.prototype.requestAsyncId.call(this, scheduler, id, delay2);
-    }
-    scheduler.actions.push(this);
-    return scheduler._scheduled || (scheduler._scheduled = animationFrameProvider.requestAnimationFrame(function() {
-      return scheduler.flush(void 0);
-    }));
-  };
-  AnimationFrameAction2.prototype.recycleAsyncId = function(scheduler, id, delay2) {
-    var _a;
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (delay2 != null ? delay2 > 0 : this.delay > 0) {
-      return _super.prototype.recycleAsyncId.call(this, scheduler, id, delay2);
-    }
-    var actions = scheduler.actions;
-    if (id != null && id === scheduler._scheduled && ((_a = actions[actions.length - 1]) === null || _a === void 0 ? void 0 : _a.id) !== id) {
-      animationFrameProvider.cancelAnimationFrame(id);
-      scheduler._scheduled = void 0;
-    }
-    return void 0;
-  };
-  return AnimationFrameAction2;
-}(AsyncAction);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/AnimationFrameScheduler.js
-var AnimationFrameScheduler = function(_super) {
-  __extends(AnimationFrameScheduler2, _super);
-  function AnimationFrameScheduler2() {
-    return _super !== null && _super.apply(this, arguments) || this;
-  }
-  AnimationFrameScheduler2.prototype.flush = function(action) {
-    this._active = true;
-    var flushId;
-    if (action) {
-      flushId = action.id;
-    } else {
-      flushId = this._scheduled;
-      this._scheduled = void 0;
-    }
-    var actions = this.actions;
-    var error;
-    action = action || actions.shift();
-    do {
-      if (error = action.execute(action.state, action.delay)) {
-        break;
-      }
-    } while ((action = actions[0]) && action.id === flushId && actions.shift());
-    this._active = false;
-    if (error) {
-      while ((action = actions[0]) && action.id === flushId && actions.shift()) {
-        action.unsubscribe();
-      }
-      throw error;
-    }
-  };
-  return AnimationFrameScheduler2;
-}(AsyncScheduler);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/animationFrame.js
-var animationFrameScheduler = new AnimationFrameScheduler(AnimationFrameAction);
-
-// node_modules/rxjs/dist/esm5/internal/scheduler/VirtualTimeScheduler.js
-var VirtualTimeScheduler = function(_super) {
-  __extends(VirtualTimeScheduler2, _super);
-  function VirtualTimeScheduler2(schedulerActionCtor, maxFrames) {
-    if (schedulerActionCtor === void 0) {
-      schedulerActionCtor = VirtualAction;
-    }
-    if (maxFrames === void 0) {
-      maxFrames = Infinity;
-    }
-    var _this = _super.call(this, schedulerActionCtor, function() {
-      return _this.frame;
-    }) || this;
-    _this.maxFrames = maxFrames;
-    _this.frame = 0;
-    _this.index = -1;
-    return _this;
-  }
-  VirtualTimeScheduler2.prototype.flush = function() {
-    var _a = this, actions = _a.actions, maxFrames = _a.maxFrames;
-    var error;
-    var action;
-    while ((action = actions[0]) && action.delay <= maxFrames) {
-      actions.shift();
-      this.frame = action.delay;
-      if (error = action.execute(action.state, action.delay)) {
-        break;
-      }
-    }
-    if (error) {
-      while (action = actions.shift()) {
-        action.unsubscribe();
-      }
-      throw error;
-    }
-  };
-  VirtualTimeScheduler2.frameTimeFactor = 10;
-  return VirtualTimeScheduler2;
-}(AsyncScheduler);
-var VirtualAction = function(_super) {
-  __extends(VirtualAction2, _super);
-  function VirtualAction2(scheduler, work, index) {
-    if (index === void 0) {
-      index = scheduler.index += 1;
-    }
-    var _this = _super.call(this, scheduler, work) || this;
-    _this.scheduler = scheduler;
-    _this.work = work;
-    _this.index = index;
-    _this.active = true;
-    _this.index = scheduler.index = index;
-    return _this;
-  }
-  VirtualAction2.prototype.schedule = function(state, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    if (Number.isFinite(delay2)) {
-      if (!this.id) {
-        return _super.prototype.schedule.call(this, state, delay2);
-      }
-      this.active = false;
-      var action = new VirtualAction2(this.scheduler, this.work);
-      this.add(action);
-      return action.schedule(state, delay2);
-    } else {
-      return Subscription.EMPTY;
-    }
-  };
-  VirtualAction2.prototype.requestAsyncId = function(scheduler, id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    this.delay = scheduler.frame + delay2;
-    var actions = scheduler.actions;
-    actions.push(this);
-    actions.sort(VirtualAction2.sortActions);
-    return 1;
-  };
-  VirtualAction2.prototype.recycleAsyncId = function(scheduler, id, delay2) {
-    if (delay2 === void 0) {
-      delay2 = 0;
-    }
-    return void 0;
-  };
-  VirtualAction2.prototype._execute = function(state, delay2) {
-    if (this.active === true) {
-      return _super.prototype._execute.call(this, state, delay2);
-    }
-  };
-  VirtualAction2.sortActions = function(a, b) {
-    if (a.delay === b.delay) {
-      if (a.index === b.index) {
-        return 0;
-      } else if (a.index > b.index) {
-        return 1;
-      } else {
-        return -1;
-      }
-    } else if (a.delay > b.delay) {
-      return 1;
-    } else {
-      return -1;
-    }
-  };
-  return VirtualAction2;
-}(AsyncAction);
-
-// node_modules/rxjs/dist/esm5/internal/observable/empty.js
-var EMPTY = new Observable(function(subscriber) {
-  return subscriber.complete();
-});
-
-// node_modules/rxjs/dist/esm5/internal/util/isScheduler.js
-function isScheduler(value) {
-  return value && isFunction(value.schedule);
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/args.js
-function last(arr) {
-  return arr[arr.length - 1];
-}
-function popResultSelector(args) {
-  return isFunction(last(args)) ? args.pop() : void 0;
-}
-function popScheduler(args) {
-  return isScheduler(last(args)) ? args.pop() : void 0;
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/isArrayLike.js
-var isArrayLike = function(x) {
-  return x && typeof x.length === "number" && typeof x !== "function";
-};
-
-// node_modules/rxjs/dist/esm5/internal/util/isPromise.js
-function isPromise(value) {
-  return isFunction(value === null || value === void 0 ? void 0 : value.then);
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/isInteropObservable.js
-function isInteropObservable(input2) {
-  return isFunction(input2[observable]);
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/isAsyncIterable.js
-function isAsyncIterable(obj) {
-  return Symbol.asyncIterator && isFunction(obj === null || obj === void 0 ? void 0 : obj[Symbol.asyncIterator]);
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/throwUnobservableError.js
-function createInvalidObservableTypeError(input2) {
-  return new TypeError("You provided " + (input2 !== null && typeof input2 === "object" ? "an invalid object" : "'" + input2 + "'") + " where a stream was expected. You can provide an Observable, Promise, ReadableStream, Array, AsyncIterable, or Iterable.");
-}
-
-// node_modules/rxjs/dist/esm5/internal/symbol/iterator.js
-function getSymbolIterator() {
-  if (typeof Symbol !== "function" || !Symbol.iterator) {
-    return "@@iterator";
-  }
-  return Symbol.iterator;
-}
-var iterator = getSymbolIterator();
-
-// node_modules/rxjs/dist/esm5/internal/util/isIterable.js
-function isIterable(input2) {
-  return isFunction(input2 === null || input2 === void 0 ? void 0 : input2[iterator]);
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js
-function readableStreamLikeToAsyncGenerator(readableStream) {
-  return __asyncGenerator(this, arguments, function readableStreamLikeToAsyncGenerator_1() {
-    var reader, _a, value, done;
-    return __generator(this, function(_b) {
-      switch (_b.label) {
-        case 0:
-          reader = readableStream.getReader();
-          _b.label = 1;
-        case 1:
-          _b.trys.push([1, , 9, 10]);
-          _b.label = 2;
-        case 2:
-          if (false) return [3, 8];
-          return [4, __await(reader.read())];
-        case 3:
-          _a = _b.sent(), value = _a.value, done = _a.done;
-          if (!done) return [3, 5];
-          return [4, __await(void 0)];
-        case 4:
-          return [2, _b.sent()];
-        case 5:
-          return [4, __await(value)];
-        case 6:
-          return [4, _b.sent()];
-        case 7:
-          _b.sent();
-          return [3, 2];
-        case 8:
-          return [3, 10];
-        case 9:
-          reader.releaseLock();
-          return [7];
-        case 10:
-          return [2];
-      }
-    });
-  });
-}
-function isReadableStreamLike(obj) {
-  return isFunction(obj === null || obj === void 0 ? void 0 : obj.getReader);
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js
-function innerFrom(input2) {
-  if (input2 instanceof Observable) {
-    return input2;
-  }
-  if (input2 != null) {
-    if (isInteropObservable(input2)) {
-      return fromInteropObservable(input2);
-    }
-    if (isArrayLike(input2)) {
-      return fromArrayLike(input2);
-    }
-    if (isPromise(input2)) {
-      return fromPromise(input2);
-    }
-    if (isAsyncIterable(input2)) {
-      return fromAsyncIterable(input2);
-    }
-    if (isIterable(input2)) {
-      return fromIterable(input2);
-    }
-    if (isReadableStreamLike(input2)) {
-      return fromReadableStreamLike(input2);
-    }
-  }
-  throw createInvalidObservableTypeError(input2);
-}
-function fromInteropObservable(obj) {
-  return new Observable(function(subscriber) {
-    var obs = obj[observable]();
-    if (isFunction(obs.subscribe)) {
-      return obs.subscribe(subscriber);
-    }
-    throw new TypeError("Provided object does not correctly implement Symbol.observable");
-  });
-}
-function fromArrayLike(array) {
-  return new Observable(function(subscriber) {
-    for (var i = 0; i < array.length && !subscriber.closed; i++) {
-      subscriber.next(array[i]);
-    }
-    subscriber.complete();
-  });
-}
-function fromPromise(promise) {
-  return new Observable(function(subscriber) {
-    promise.then(function(value) {
-      if (!subscriber.closed) {
-        subscriber.next(value);
-        subscriber.complete();
-      }
-    }, function(err) {
-      return subscriber.error(err);
-    }).then(null, reportUnhandledError);
-  });
-}
-function fromIterable(iterable) {
-  return new Observable(function(subscriber) {
-    var e_1, _a;
-    try {
-      for (var iterable_1 = __values(iterable), iterable_1_1 = iterable_1.next(); !iterable_1_1.done; iterable_1_1 = iterable_1.next()) {
-        var value = iterable_1_1.value;
-        subscriber.next(value);
-        if (subscriber.closed) {
-          return;
-        }
-      }
-    } catch (e_1_1) {
-      e_1 = {
-        error: e_1_1
-      };
-    } finally {
-      try {
-        if (iterable_1_1 && !iterable_1_1.done && (_a = iterable_1.return)) _a.call(iterable_1);
-      } finally {
-        if (e_1) throw e_1.error;
-      }
-    }
-    subscriber.complete();
-  });
-}
-function fromAsyncIterable(asyncIterable) {
-  return new Observable(function(subscriber) {
-    process(asyncIterable, subscriber).catch(function(err) {
-      return subscriber.error(err);
-    });
-  });
-}
-function fromReadableStreamLike(readableStream) {
-  return fromAsyncIterable(readableStreamLikeToAsyncGenerator(readableStream));
-}
-function process(asyncIterable, subscriber) {
-  var asyncIterable_1, asyncIterable_1_1;
-  var e_2, _a;
-  return __awaiter(this, void 0, void 0, function() {
-    var value, e_2_1;
-    return __generator(this, function(_b) {
-      switch (_b.label) {
-        case 0:
-          _b.trys.push([0, 5, 6, 11]);
-          asyncIterable_1 = __asyncValues(asyncIterable);
-          _b.label = 1;
-        case 1:
-          return [4, asyncIterable_1.next()];
-        case 2:
-          if (!(asyncIterable_1_1 = _b.sent(), !asyncIterable_1_1.done)) return [3, 4];
-          value = asyncIterable_1_1.value;
-          subscriber.next(value);
-          if (subscriber.closed) {
-            return [2];
-          }
-          _b.label = 3;
-        case 3:
-          return [3, 1];
-        case 4:
-          return [3, 11];
-        case 5:
-          e_2_1 = _b.sent();
-          e_2 = {
-            error: e_2_1
-          };
-          return [3, 11];
-        case 6:
-          _b.trys.push([6, , 9, 10]);
-          if (!(asyncIterable_1_1 && !asyncIterable_1_1.done && (_a = asyncIterable_1.return))) return [3, 8];
-          return [4, _a.call(asyncIterable_1)];
-        case 7:
-          _b.sent();
-          _b.label = 8;
-        case 8:
-          return [3, 10];
-        case 9:
-          if (e_2) throw e_2.error;
-          return [7];
-        case 10:
-          return [7];
-        case 11:
-          subscriber.complete();
-          return [2];
-      }
-    });
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js
-function executeSchedule(parentSubscription, scheduler, work, delay2, repeat2) {
-  if (delay2 === void 0) {
-    delay2 = 0;
-  }
-  if (repeat2 === void 0) {
-    repeat2 = false;
-  }
-  var scheduleSubscription = scheduler.schedule(function() {
-    work();
-    if (repeat2) {
-      parentSubscription.add(this.schedule(null, delay2));
-    } else {
-      this.unsubscribe();
-    }
-  }, delay2);
-  parentSubscription.add(scheduleSubscription);
-  if (!repeat2) {
-    return scheduleSubscription;
-  }
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/observeOn.js
-function observeOn(scheduler, delay2) {
-  if (delay2 === void 0) {
-    delay2 = 0;
-  }
-  return operate(function(source, subscriber) {
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      return executeSchedule(subscriber, scheduler, function() {
-        return subscriber.next(value);
-      }, delay2);
-    }, function() {
-      return executeSchedule(subscriber, scheduler, function() {
-        return subscriber.complete();
-      }, delay2);
-    }, function(err) {
-      return executeSchedule(subscriber, scheduler, function() {
-        return subscriber.error(err);
-      }, delay2);
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/subscribeOn.js
-function subscribeOn(scheduler, delay2) {
-  if (delay2 === void 0) {
-    delay2 = 0;
-  }
-  return operate(function(source, subscriber) {
-    subscriber.add(scheduler.schedule(function() {
-      return source.subscribe(subscriber);
-    }, delay2));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/scheduleObservable.js
-function scheduleObservable(input2, scheduler) {
-  return innerFrom(input2).pipe(subscribeOn(scheduler), observeOn(scheduler));
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/schedulePromise.js
-function schedulePromise(input2, scheduler) {
-  return innerFrom(input2).pipe(subscribeOn(scheduler), observeOn(scheduler));
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/scheduleArray.js
-function scheduleArray(input2, scheduler) {
-  return new Observable(function(subscriber) {
-    var i = 0;
-    return scheduler.schedule(function() {
-      if (i === input2.length) {
-        subscriber.complete();
-      } else {
-        subscriber.next(input2[i++]);
-        if (!subscriber.closed) {
-          this.schedule();
-        }
-      }
-    });
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/scheduleIterable.js
-function scheduleIterable(input2, scheduler) {
-  return new Observable(function(subscriber) {
-    var iterator2;
-    executeSchedule(subscriber, scheduler, function() {
-      iterator2 = input2[iterator]();
-      executeSchedule(subscriber, scheduler, function() {
-        var _a;
-        var value;
-        var done;
-        try {
-          _a = iterator2.next(), value = _a.value, done = _a.done;
-        } catch (err) {
-          subscriber.error(err);
-          return;
-        }
-        if (done) {
-          subscriber.complete();
-        } else {
-          subscriber.next(value);
-        }
-      }, 0, true);
-    });
-    return function() {
-      return isFunction(iterator2 === null || iterator2 === void 0 ? void 0 : iterator2.return) && iterator2.return();
-    };
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/scheduleAsyncIterable.js
-function scheduleAsyncIterable(input2, scheduler) {
-  if (!input2) {
-    throw new Error("Iterable cannot be null");
-  }
-  return new Observable(function(subscriber) {
-    executeSchedule(subscriber, scheduler, function() {
-      var iterator2 = input2[Symbol.asyncIterator]();
-      executeSchedule(subscriber, scheduler, function() {
-        iterator2.next().then(function(result) {
-          if (result.done) {
-            subscriber.complete();
-          } else {
-            subscriber.next(result.value);
-          }
-        });
-      }, 0, true);
-    });
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/scheduleReadableStreamLike.js
-function scheduleReadableStreamLike(input2, scheduler) {
-  return scheduleAsyncIterable(readableStreamLikeToAsyncGenerator(input2), scheduler);
-}
-
-// node_modules/rxjs/dist/esm5/internal/scheduled/scheduled.js
-function scheduled(input2, scheduler) {
-  if (input2 != null) {
-    if (isInteropObservable(input2)) {
-      return scheduleObservable(input2, scheduler);
-    }
-    if (isArrayLike(input2)) {
-      return scheduleArray(input2, scheduler);
-    }
-    if (isPromise(input2)) {
-      return schedulePromise(input2, scheduler);
-    }
-    if (isAsyncIterable(input2)) {
-      return scheduleAsyncIterable(input2, scheduler);
-    }
-    if (isIterable(input2)) {
-      return scheduleIterable(input2, scheduler);
-    }
-    if (isReadableStreamLike(input2)) {
-      return scheduleReadableStreamLike(input2, scheduler);
-    }
-  }
-  throw createInvalidObservableTypeError(input2);
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/from.js
-function from(input2, scheduler) {
-  return scheduler ? scheduled(input2, scheduler) : innerFrom(input2);
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/of.js
-function of() {
-  var args = [];
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-  var scheduler = popScheduler(args);
-  return from(args, scheduler);
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/throwError.js
-function throwError(errorOrErrorFactory, scheduler) {
-  var errorFactory = isFunction(errorOrErrorFactory) ? errorOrErrorFactory : function() {
-    return errorOrErrorFactory;
-  };
-  var init = function(subscriber) {
-    return subscriber.error(errorFactory());
-  };
-  return new Observable(scheduler ? function(subscriber) {
-    return scheduler.schedule(init, 0, subscriber);
-  } : init);
-}
-
-// node_modules/rxjs/dist/esm5/internal/Notification.js
-var NotificationKind;
-(function(NotificationKind2) {
-  NotificationKind2["NEXT"] = "N";
-  NotificationKind2["ERROR"] = "E";
-  NotificationKind2["COMPLETE"] = "C";
-})(NotificationKind || (NotificationKind = {}));
-var Notification = function() {
-  function Notification2(kind, value, error) {
-    this.kind = kind;
-    this.value = value;
-    this.error = error;
-    this.hasValue = kind === "N";
-  }
-  Notification2.prototype.observe = function(observer) {
-    return observeNotification(this, observer);
-  };
-  Notification2.prototype.do = function(nextHandler, errorHandler, completeHandler) {
-    var _a = this, kind = _a.kind, value = _a.value, error = _a.error;
-    return kind === "N" ? nextHandler === null || nextHandler === void 0 ? void 0 : nextHandler(value) : kind === "E" ? errorHandler === null || errorHandler === void 0 ? void 0 : errorHandler(error) : completeHandler === null || completeHandler === void 0 ? void 0 : completeHandler();
-  };
-  Notification2.prototype.accept = function(nextOrObserver, error, complete) {
-    var _a;
-    return isFunction((_a = nextOrObserver) === null || _a === void 0 ? void 0 : _a.next) ? this.observe(nextOrObserver) : this.do(nextOrObserver, error, complete);
-  };
-  Notification2.prototype.toObservable = function() {
-    var _a = this, kind = _a.kind, value = _a.value, error = _a.error;
-    var result = kind === "N" ? of(value) : kind === "E" ? throwError(function() {
-      return error;
-    }) : kind === "C" ? EMPTY : 0;
-    if (!result) {
-      throw new TypeError("Unexpected notification kind " + kind);
-    }
-    return result;
-  };
-  Notification2.createNext = function(value) {
-    return new Notification2("N", value);
-  };
-  Notification2.createError = function(err) {
-    return new Notification2("E", void 0, err);
-  };
-  Notification2.createComplete = function() {
-    return Notification2.completeNotification;
-  };
-  Notification2.completeNotification = new Notification2("C");
-  return Notification2;
-}();
-function observeNotification(notification, observer) {
-  var _a, _b, _c;
-  var _d = notification, kind = _d.kind, value = _d.value, error = _d.error;
-  if (typeof kind !== "string") {
-    throw new TypeError('Invalid notification, missing "kind"');
-  }
-  kind === "N" ? (_a = observer.next) === null || _a === void 0 ? void 0 : _a.call(observer, value) : kind === "E" ? (_b = observer.error) === null || _b === void 0 ? void 0 : _b.call(observer, error) : (_c = observer.complete) === null || _c === void 0 ? void 0 : _c.call(observer);
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/isObservable.js
-function isObservable(obj) {
-  return !!obj && (obj instanceof Observable || isFunction(obj.lift) && isFunction(obj.subscribe));
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/EmptyError.js
-var EmptyError = createErrorClass(function(_super) {
-  return function EmptyErrorImpl() {
-    _super(this);
-    this.name = "EmptyError";
-    this.message = "no elements in sequence";
-  };
-});
-
-// node_modules/rxjs/dist/esm5/internal/util/ArgumentOutOfRangeError.js
-var ArgumentOutOfRangeError = createErrorClass(function(_super) {
-  return function ArgumentOutOfRangeErrorImpl() {
-    _super(this);
-    this.name = "ArgumentOutOfRangeError";
-    this.message = "argument out of range";
-  };
-});
-
-// node_modules/rxjs/dist/esm5/internal/util/NotFoundError.js
-var NotFoundError = createErrorClass(function(_super) {
-  return function NotFoundErrorImpl(message) {
-    _super(this);
-    this.name = "NotFoundError";
-    this.message = message;
-  };
-});
-
-// node_modules/rxjs/dist/esm5/internal/util/SequenceError.js
-var SequenceError = createErrorClass(function(_super) {
-  return function SequenceErrorImpl(message) {
-    _super(this);
-    this.name = "SequenceError";
-    this.message = message;
-  };
-});
-
-// node_modules/rxjs/dist/esm5/internal/util/isDate.js
-function isValidDate(value) {
-  return value instanceof Date && !isNaN(value);
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/timeout.js
-var TimeoutError = createErrorClass(function(_super) {
-  return function TimeoutErrorImpl(info) {
-    if (info === void 0) {
-      info = null;
-    }
-    _super(this);
-    this.message = "Timeout has occurred";
-    this.name = "TimeoutError";
-    this.info = info;
-  };
-});
-function timeout(config2, schedulerArg) {
-  var _a = isValidDate(config2) ? {
-    first: config2
-  } : typeof config2 === "number" ? {
-    each: config2
-  } : config2, first2 = _a.first, each = _a.each, _b = _a.with, _with = _b === void 0 ? timeoutErrorFactory : _b, _c = _a.scheduler, scheduler = _c === void 0 ? schedulerArg !== null && schedulerArg !== void 0 ? schedulerArg : asyncScheduler : _c, _d = _a.meta, meta = _d === void 0 ? null : _d;
-  if (first2 == null && each == null) {
-    throw new TypeError("No timeout provided.");
-  }
-  return operate(function(source, subscriber) {
-    var originalSourceSubscription;
-    var timerSubscription;
-    var lastValue = null;
-    var seen = 0;
-    var startTimer = function(delay2) {
-      timerSubscription = executeSchedule(subscriber, scheduler, function() {
-        try {
-          originalSourceSubscription.unsubscribe();
-          innerFrom(_with({
-            meta,
-            lastValue,
-            seen
-          })).subscribe(subscriber);
-        } catch (err) {
-          subscriber.error(err);
-        }
-      }, delay2);
-    };
-    originalSourceSubscription = source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      timerSubscription === null || timerSubscription === void 0 ? void 0 : timerSubscription.unsubscribe();
-      seen++;
-      subscriber.next(lastValue = value);
-      each > 0 && startTimer(each);
-    }, void 0, void 0, function() {
-      if (!(timerSubscription === null || timerSubscription === void 0 ? void 0 : timerSubscription.closed)) {
-        timerSubscription === null || timerSubscription === void 0 ? void 0 : timerSubscription.unsubscribe();
-      }
-      lastValue = null;
-    }));
-    !seen && startTimer(first2 != null ? typeof first2 === "number" ? first2 : +first2 - scheduler.now() : each);
-  });
-}
-function timeoutErrorFactory(info) {
-  throw new TimeoutError(info);
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/map.js
-function map(project, thisArg) {
-  return operate(function(source, subscriber) {
-    var index = 0;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      subscriber.next(project.call(thisArg, value, index++));
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/mapOneOrManyArgs.js
-var isArray = Array.isArray;
-function callOrApply(fn, args) {
-  return isArray(args) ? fn.apply(void 0, __spreadArray([], __read(args))) : fn(args);
-}
-function mapOneOrManyArgs(fn) {
-  return map(function(args) {
-    return callOrApply(fn, args);
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/argsArgArrayOrObject.js
-var isArray2 = Array.isArray;
-var getPrototypeOf = Object.getPrototypeOf;
-var objectProto = Object.prototype;
-var getKeys = Object.keys;
-function argsArgArrayOrObject(args) {
-  if (args.length === 1) {
-    var first_1 = args[0];
-    if (isArray2(first_1)) {
-      return {
-        args: first_1,
-        keys: null
-      };
-    }
-    if (isPOJO(first_1)) {
-      var keys = getKeys(first_1);
-      return {
-        args: keys.map(function(key) {
-          return first_1[key];
-        }),
-        keys
-      };
-    }
-  }
-  return {
-    args,
-    keys: null
-  };
-}
-function isPOJO(obj) {
-  return obj && typeof obj === "object" && getPrototypeOf(obj) === objectProto;
-}
-
-// node_modules/rxjs/dist/esm5/internal/util/createObject.js
-function createObject(keys, values) {
-  return keys.reduce(function(result, key, i) {
-    return result[key] = values[i], result;
-  }, {});
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/combineLatest.js
-function combineLatest() {
-  var args = [];
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-  var scheduler = popScheduler(args);
-  var resultSelector = popResultSelector(args);
-  var _a = argsArgArrayOrObject(args), observables = _a.args, keys = _a.keys;
-  if (observables.length === 0) {
-    return from([], scheduler);
-  }
-  var result = new Observable(combineLatestInit(observables, scheduler, keys ? function(values) {
-    return createObject(keys, values);
-  } : identity));
-  return resultSelector ? result.pipe(mapOneOrManyArgs(resultSelector)) : result;
-}
-function combineLatestInit(observables, scheduler, valueTransform) {
-  if (valueTransform === void 0) {
-    valueTransform = identity;
-  }
-  return function(subscriber) {
-    maybeSchedule(scheduler, function() {
-      var length = observables.length;
-      var values = new Array(length);
-      var active = length;
-      var remainingFirstValues = length;
-      var _loop_1 = function(i2) {
-        maybeSchedule(scheduler, function() {
-          var source = from(observables[i2], scheduler);
-          var hasFirstValue = false;
-          source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-            values[i2] = value;
-            if (!hasFirstValue) {
-              hasFirstValue = true;
-              remainingFirstValues--;
-            }
-            if (!remainingFirstValues) {
-              subscriber.next(valueTransform(values.slice()));
-            }
-          }, function() {
-            if (!--active) {
-              subscriber.complete();
-            }
-          }));
-        }, subscriber);
-      };
-      for (var i = 0; i < length; i++) {
-        _loop_1(i);
-      }
-    }, subscriber);
-  };
-}
-function maybeSchedule(scheduler, execute, subscription) {
-  if (scheduler) {
-    executeSchedule(subscription, scheduler, execute);
-  } else {
-    execute();
-  }
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/mergeInternals.js
-function mergeInternals(source, subscriber, project, concurrent, onBeforeNext, expand2, innerSubScheduler, additionalFinalizer) {
-  var buffer2 = [];
-  var active = 0;
-  var index = 0;
-  var isComplete = false;
-  var checkComplete = function() {
-    if (isComplete && !buffer2.length && !active) {
-      subscriber.complete();
-    }
-  };
-  var outerNext = function(value) {
-    return active < concurrent ? doInnerSub(value) : buffer2.push(value);
-  };
-  var doInnerSub = function(value) {
-    expand2 && subscriber.next(value);
-    active++;
-    var innerComplete = false;
-    innerFrom(project(value, index++)).subscribe(createOperatorSubscriber(subscriber, function(innerValue) {
-      onBeforeNext === null || onBeforeNext === void 0 ? void 0 : onBeforeNext(innerValue);
-      if (expand2) {
-        outerNext(innerValue);
-      } else {
-        subscriber.next(innerValue);
-      }
-    }, function() {
-      innerComplete = true;
-    }, void 0, function() {
-      if (innerComplete) {
-        try {
-          active--;
-          var _loop_1 = function() {
-            var bufferedValue = buffer2.shift();
-            if (innerSubScheduler) {
-              executeSchedule(subscriber, innerSubScheduler, function() {
-                return doInnerSub(bufferedValue);
-              });
-            } else {
-              doInnerSub(bufferedValue);
-            }
-          };
-          while (buffer2.length && active < concurrent) {
-            _loop_1();
-          }
-          checkComplete();
-        } catch (err) {
-          subscriber.error(err);
-        }
-      }
-    }));
-  };
-  source.subscribe(createOperatorSubscriber(subscriber, outerNext, function() {
-    isComplete = true;
-    checkComplete();
-  }));
-  return function() {
-    additionalFinalizer === null || additionalFinalizer === void 0 ? void 0 : additionalFinalizer();
-  };
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js
-function mergeMap(project, resultSelector, concurrent) {
-  if (concurrent === void 0) {
-    concurrent = Infinity;
-  }
-  if (isFunction(resultSelector)) {
-    return mergeMap(function(a, i) {
-      return map(function(b, ii) {
-        return resultSelector(a, b, i, ii);
-      })(innerFrom(project(a, i)));
-    }, concurrent);
-  } else if (typeof resultSelector === "number") {
-    concurrent = resultSelector;
-  }
-  return operate(function(source, subscriber) {
-    return mergeInternals(source, subscriber, project, concurrent);
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/mergeAll.js
-function mergeAll(concurrent) {
-  if (concurrent === void 0) {
-    concurrent = Infinity;
-  }
-  return mergeMap(identity, concurrent);
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/concatAll.js
-function concatAll() {
-  return mergeAll(1);
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/concat.js
-function concat() {
-  var args = [];
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-  return concatAll()(from(args, popScheduler(args)));
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/defer.js
-function defer(observableFactory) {
-  return new Observable(function(subscriber) {
-    innerFrom(observableFactory()).subscribe(subscriber);
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/forkJoin.js
-function forkJoin() {
-  var args = [];
-  for (var _i = 0; _i < arguments.length; _i++) {
-    args[_i] = arguments[_i];
-  }
-  var resultSelector = popResultSelector(args);
-  var _a = argsArgArrayOrObject(args), sources = _a.args, keys = _a.keys;
-  var result = new Observable(function(subscriber) {
-    var length = sources.length;
-    if (!length) {
-      subscriber.complete();
-      return;
-    }
-    var values = new Array(length);
-    var remainingCompletions = length;
-    var remainingEmissions = length;
-    var _loop_1 = function(sourceIndex2) {
-      var hasValue = false;
-      innerFrom(sources[sourceIndex2]).subscribe(createOperatorSubscriber(subscriber, function(value) {
-        if (!hasValue) {
-          hasValue = true;
-          remainingEmissions--;
-        }
-        values[sourceIndex2] = value;
-      }, function() {
-        return remainingCompletions--;
-      }, void 0, function() {
-        if (!remainingCompletions || !hasValue) {
-          if (!remainingEmissions) {
-            subscriber.next(keys ? createObject(keys, values) : values);
-          }
-          subscriber.complete();
-        }
-      }));
-    };
-    for (var sourceIndex = 0; sourceIndex < length; sourceIndex++) {
-      _loop_1(sourceIndex);
-    }
-  });
-  return resultSelector ? result.pipe(mapOneOrManyArgs(resultSelector)) : result;
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/timer.js
-function timer(dueTime, intervalOrScheduler, scheduler) {
-  if (dueTime === void 0) {
-    dueTime = 0;
-  }
-  if (scheduler === void 0) {
-    scheduler = async;
-  }
-  var intervalDuration = -1;
-  if (intervalOrScheduler != null) {
-    if (isScheduler(intervalOrScheduler)) {
-      scheduler = intervalOrScheduler;
-    } else {
-      intervalDuration = intervalOrScheduler;
-    }
-  }
-  return new Observable(function(subscriber) {
-    var due = isValidDate(dueTime) ? +dueTime - scheduler.now() : dueTime;
-    if (due < 0) {
-      due = 0;
-    }
-    var n = 0;
-    return scheduler.schedule(function() {
-      if (!subscriber.closed) {
-        subscriber.next(n++);
-        if (0 <= intervalDuration) {
-          this.schedule(void 0, intervalDuration);
-        } else {
-          subscriber.complete();
-        }
-      }
-    }, due);
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/observable/never.js
-var NEVER = new Observable(noop);
-
-// node_modules/rxjs/dist/esm5/internal/util/argsOrArgArray.js
-var isArray3 = Array.isArray;
-
-// node_modules/rxjs/dist/esm5/internal/operators/filter.js
-function filter(predicate, thisArg) {
-  return operate(function(source, subscriber) {
-    var index = 0;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      return predicate.call(thisArg, value, index++) && subscriber.next(value);
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/catchError.js
-function catchError(selector) {
-  return operate(function(source, subscriber) {
-    var innerSub = null;
-    var syncUnsub = false;
-    var handledResult;
-    innerSub = source.subscribe(createOperatorSubscriber(subscriber, void 0, void 0, function(err) {
-      handledResult = innerFrom(selector(err, catchError(selector)(source)));
-      if (innerSub) {
-        innerSub.unsubscribe();
-        innerSub = null;
-        handledResult.subscribe(subscriber);
-      } else {
-        syncUnsub = true;
-      }
-    }));
-    if (syncUnsub) {
-      innerSub.unsubscribe();
-      innerSub = null;
-      handledResult.subscribe(subscriber);
-    }
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/scanInternals.js
-function scanInternals(accumulator, seed, hasSeed, emitOnNext, emitBeforeComplete) {
-  return function(source, subscriber) {
-    var hasState = hasSeed;
-    var state = seed;
-    var index = 0;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      var i = index++;
-      state = hasState ? accumulator(state, value, i) : (hasState = true, value);
-      emitOnNext && subscriber.next(state);
-    }, emitBeforeComplete && function() {
-      hasState && subscriber.next(state);
-      subscriber.complete();
-    }));
-  };
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/concatMap.js
-function concatMap(project, resultSelector) {
-  return isFunction(resultSelector) ? mergeMap(project, resultSelector, 1) : mergeMap(project, 1);
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/defaultIfEmpty.js
-function defaultIfEmpty(defaultValue) {
-  return operate(function(source, subscriber) {
-    var hasValue = false;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      hasValue = true;
-      subscriber.next(value);
-    }, function() {
-      if (!hasValue) {
-        subscriber.next(defaultValue);
-      }
-      subscriber.complete();
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/take.js
-function take(count2) {
-  return count2 <= 0 ? function() {
-    return EMPTY;
-  } : operate(function(source, subscriber) {
-    var seen = 0;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      if (++seen <= count2) {
-        subscriber.next(value);
-        if (count2 <= seen) {
-          subscriber.complete();
-        }
-      }
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/mapTo.js
-function mapTo(value) {
-  return map(function() {
-    return value;
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/distinctUntilChanged.js
-function distinctUntilChanged(comparator, keySelector) {
-  if (keySelector === void 0) {
-    keySelector = identity;
-  }
-  comparator = comparator !== null && comparator !== void 0 ? comparator : defaultCompare;
-  return operate(function(source, subscriber) {
-    var previousKey;
-    var first2 = true;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      var currentKey = keySelector(value);
-      if (first2 || !comparator(previousKey, currentKey)) {
-        first2 = false;
-        previousKey = currentKey;
-        subscriber.next(value);
-      }
-    }));
-  });
-}
-function defaultCompare(a, b) {
-  return a === b;
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/throwIfEmpty.js
-function throwIfEmpty(errorFactory) {
-  if (errorFactory === void 0) {
-    errorFactory = defaultErrorFactory;
-  }
-  return operate(function(source, subscriber) {
-    var hasValue = false;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      hasValue = true;
-      subscriber.next(value);
-    }, function() {
-      return hasValue ? subscriber.complete() : subscriber.error(errorFactory());
-    }));
-  });
-}
-function defaultErrorFactory() {
-  return new EmptyError();
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/finalize.js
-function finalize(callback) {
-  return operate(function(source, subscriber) {
-    try {
-      source.subscribe(subscriber);
-    } finally {
-      subscriber.add(callback);
-    }
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/first.js
-function first(predicate, defaultValue) {
-  var hasDefaultValue = arguments.length >= 2;
-  return function(source) {
-    return source.pipe(predicate ? filter(function(v, i) {
-      return predicate(v, i, source);
-    }) : identity, take(1), hasDefaultValue ? defaultIfEmpty(defaultValue) : throwIfEmpty(function() {
-      return new EmptyError();
-    }));
-  };
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/takeLast.js
-function takeLast(count2) {
-  return count2 <= 0 ? function() {
-    return EMPTY;
-  } : operate(function(source, subscriber) {
-    var buffer2 = [];
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      buffer2.push(value);
-      count2 < buffer2.length && buffer2.shift();
-    }, function() {
-      var e_1, _a;
-      try {
-        for (var buffer_1 = __values(buffer2), buffer_1_1 = buffer_1.next(); !buffer_1_1.done; buffer_1_1 = buffer_1.next()) {
-          var value = buffer_1_1.value;
-          subscriber.next(value);
-        }
-      } catch (e_1_1) {
-        e_1 = {
-          error: e_1_1
-        };
-      } finally {
-        try {
-          if (buffer_1_1 && !buffer_1_1.done && (_a = buffer_1.return)) _a.call(buffer_1);
-        } finally {
-          if (e_1) throw e_1.error;
-        }
-      }
-      subscriber.complete();
-    }, void 0, function() {
-      buffer2 = null;
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/last.js
-function last2(predicate, defaultValue) {
-  var hasDefaultValue = arguments.length >= 2;
-  return function(source) {
-    return source.pipe(predicate ? filter(function(v, i) {
-      return predicate(v, i, source);
-    }) : identity, takeLast(1), hasDefaultValue ? defaultIfEmpty(defaultValue) : throwIfEmpty(function() {
-      return new EmptyError();
-    }));
-  };
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/retry.js
-function retry(configOrCount) {
-  if (configOrCount === void 0) {
-    configOrCount = Infinity;
-  }
-  var config2;
-  if (configOrCount && typeof configOrCount === "object") {
-    config2 = configOrCount;
-  } else {
-    config2 = {
-      count: configOrCount
-    };
-  }
-  var _a = config2.count, count2 = _a === void 0 ? Infinity : _a, delay2 = config2.delay, _b = config2.resetOnSuccess, resetOnSuccess = _b === void 0 ? false : _b;
-  return count2 <= 0 ? identity : operate(function(source, subscriber) {
-    var soFar = 0;
-    var innerSub;
-    var subscribeForRetry = function() {
-      var syncUnsub = false;
-      innerSub = source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-        if (resetOnSuccess) {
-          soFar = 0;
-        }
-        subscriber.next(value);
-      }, void 0, function(err) {
-        if (soFar++ < count2) {
-          var resub_1 = function() {
-            if (innerSub) {
-              innerSub.unsubscribe();
-              innerSub = null;
-              subscribeForRetry();
-            } else {
-              syncUnsub = true;
-            }
-          };
-          if (delay2 != null) {
-            var notifier = typeof delay2 === "number" ? timer(delay2) : innerFrom(delay2(err, soFar));
-            var notifierSubscriber_1 = createOperatorSubscriber(subscriber, function() {
-              notifierSubscriber_1.unsubscribe();
-              resub_1();
-            }, function() {
-              subscriber.complete();
-            });
-            notifier.subscribe(notifierSubscriber_1);
-          } else {
-            resub_1();
-          }
-        } else {
-          subscriber.error(err);
-        }
-      }));
-      if (syncUnsub) {
-        innerSub.unsubscribe();
-        innerSub = null;
-        subscribeForRetry();
-      }
-    };
-    subscribeForRetry();
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/retryWhen.js
-function retryWhen(notifier) {
-  return operate(function(source, subscriber) {
-    var innerSub;
-    var syncResub = false;
-    var errors$;
-    var subscribeForRetryWhen = function() {
-      innerSub = source.subscribe(createOperatorSubscriber(subscriber, void 0, void 0, function(err) {
-        if (!errors$) {
-          errors$ = new Subject();
-          innerFrom(notifier(errors$)).subscribe(createOperatorSubscriber(subscriber, function() {
-            return innerSub ? subscribeForRetryWhen() : syncResub = true;
-          }));
-        }
-        if (errors$) {
-          errors$.next(err);
-        }
-      }));
-      if (syncResub) {
-        innerSub.unsubscribe();
-        innerSub = null;
-        syncResub = false;
-        subscribeForRetryWhen();
-      }
-    };
-    subscribeForRetryWhen();
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/scan.js
-function scan(accumulator, seed) {
-  return operate(scanInternals(accumulator, seed, arguments.length >= 2, true));
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/startWith.js
-function startWith() {
-  var values = [];
-  for (var _i = 0; _i < arguments.length; _i++) {
-    values[_i] = arguments[_i];
-  }
-  var scheduler = popScheduler(values);
-  return operate(function(source, subscriber) {
-    (scheduler ? concat(values, source, scheduler) : concat(values, source)).subscribe(subscriber);
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/switchMap.js
-function switchMap(project, resultSelector) {
-  return operate(function(source, subscriber) {
-    var innerSubscriber = null;
-    var index = 0;
-    var isComplete = false;
-    var checkComplete = function() {
-      return isComplete && !innerSubscriber && subscriber.complete();
-    };
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      innerSubscriber === null || innerSubscriber === void 0 ? void 0 : innerSubscriber.unsubscribe();
-      var innerIndex = 0;
-      var outerIndex = index++;
-      innerFrom(project(value, outerIndex)).subscribe(innerSubscriber = createOperatorSubscriber(subscriber, function(innerValue) {
-        return subscriber.next(resultSelector ? resultSelector(value, innerValue, outerIndex, innerIndex++) : innerValue);
-      }, function() {
-        innerSubscriber = null;
-        checkComplete();
-      }));
-    }, function() {
-      isComplete = true;
-      checkComplete();
-    }));
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/takeUntil.js
-function takeUntil(notifier) {
-  return operate(function(source, subscriber) {
-    innerFrom(notifier).subscribe(createOperatorSubscriber(subscriber, function() {
-      return subscriber.complete();
-    }, noop));
-    !subscriber.closed && source.subscribe(subscriber);
-  });
-}
-
-// node_modules/rxjs/dist/esm5/internal/operators/tap.js
-function tap(observerOrNext, error, complete) {
-  var tapObserver = isFunction(observerOrNext) || error || complete ? {
-    next: observerOrNext,
-    error,
-    complete
-  } : observerOrNext;
-  return tapObserver ? operate(function(source, subscriber) {
-    var _a;
-    (_a = tapObserver.subscribe) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
-    var isUnsub = true;
-    source.subscribe(createOperatorSubscriber(subscriber, function(value) {
-      var _a2;
-      (_a2 = tapObserver.next) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver, value);
-      subscriber.next(value);
-    }, function() {
-      var _a2;
-      isUnsub = false;
-      (_a2 = tapObserver.complete) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver);
-      subscriber.complete();
-    }, function(err) {
-      var _a2;
-      isUnsub = false;
-      (_a2 = tapObserver.error) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver, err);
-      subscriber.error(err);
-    }, function() {
-      var _a2, _b;
-      if (isUnsub) {
-        (_a2 = tapObserver.unsubscribe) === null || _a2 === void 0 ? void 0 : _a2.call(tapObserver);
-      }
-      (_b = tapObserver.finalize) === null || _b === void 0 ? void 0 : _b.call(tapObserver);
-    }));
-  }) : identity;
-}
 
 // node_modules/@angular/core/fesm2022/primitives/event-dispatch.mjs
 var Attribute = {
@@ -3070,8 +929,8 @@ function setIsReplay(eventInfo, replay) {
 function getResolved(eventInfo) {
   return eventInfo.eir;
 }
-function setResolved(eventInfo, resolved2) {
-  eventInfo.eir = resolved2;
+function setResolved(eventInfo, resolved) {
+  eventInfo.eir = resolved;
 }
 function cloneEventInfo(eventInfo) {
   return {
@@ -3156,8 +1015,8 @@ var EventInfoWrapper = class _EventInfoWrapper {
   getResolved() {
     return getResolved(this.eventInfo);
   }
-  setResolved(resolved2) {
-    setResolved(this.eventInfo, resolved2);
+  setResolved(resolved) {
+    setResolved(this.eventInfo, resolved);
   }
   clone() {
     return new _EventInfoWrapper(cloneEventInfo(this.eventInfo));
@@ -3963,7 +1822,7 @@ function isForwardRef(fn) {
 }
 function assertNumber(actual, msg) {
   if (!(typeof actual === "number")) {
-    throwError2(msg, typeof actual, "number", "===");
+    throwError(msg, typeof actual, "number", "===");
   }
 }
 function assertNumberInRange(actual, minInclusive, maxInclusive) {
@@ -3973,86 +1832,86 @@ function assertNumberInRange(actual, minInclusive, maxInclusive) {
 }
 function assertString(actual, msg) {
   if (!(typeof actual === "string")) {
-    throwError2(msg, actual === null ? "null" : typeof actual, "string", "===");
+    throwError(msg, actual === null ? "null" : typeof actual, "string", "===");
   }
 }
 function assertFunction(actual, msg) {
   if (!(typeof actual === "function")) {
-    throwError2(msg, actual === null ? "null" : typeof actual, "function", "===");
+    throwError(msg, actual === null ? "null" : typeof actual, "function", "===");
   }
 }
 function assertEqual(actual, expected, msg) {
   if (!(actual == expected)) {
-    throwError2(msg, actual, expected, "==");
+    throwError(msg, actual, expected, "==");
   }
 }
 function assertNotEqual(actual, expected, msg) {
   if (!(actual != expected)) {
-    throwError2(msg, actual, expected, "!=");
+    throwError(msg, actual, expected, "!=");
   }
 }
 function assertSame(actual, expected, msg) {
   if (!(actual === expected)) {
-    throwError2(msg, actual, expected, "===");
+    throwError(msg, actual, expected, "===");
   }
 }
 function assertNotSame(actual, expected, msg) {
   if (!(actual !== expected)) {
-    throwError2(msg, actual, expected, "!==");
+    throwError(msg, actual, expected, "!==");
   }
 }
 function assertLessThan(actual, expected, msg) {
   if (!(actual < expected)) {
-    throwError2(msg, actual, expected, "<");
+    throwError(msg, actual, expected, "<");
   }
 }
 function assertLessThanOrEqual(actual, expected, msg) {
   if (!(actual <= expected)) {
-    throwError2(msg, actual, expected, "<=");
+    throwError(msg, actual, expected, "<=");
   }
 }
 function assertGreaterThan(actual, expected, msg) {
   if (!(actual > expected)) {
-    throwError2(msg, actual, expected, ">");
+    throwError(msg, actual, expected, ">");
   }
 }
 function assertGreaterThanOrEqual(actual, expected, msg) {
   if (!(actual >= expected)) {
-    throwError2(msg, actual, expected, ">=");
+    throwError(msg, actual, expected, ">=");
   }
 }
 function assertDefined(actual, msg) {
   if (actual == null) {
-    throwError2(msg, actual, null, "!=");
+    throwError(msg, actual, null, "!=");
   }
 }
-function throwError2(msg, actual, expected, comparison) {
+function throwError(msg, actual, expected, comparison) {
   throw new Error(`ASSERTION ERROR: ${msg}` + (comparison == null ? "" : ` [Expected=> ${expected} ${comparison} ${actual} <=Actual]`));
 }
 function assertDomNode(node) {
   if (!(node instanceof Node)) {
-    throwError2(`The provided value must be an instance of a DOM Node but got ${stringify(node)}`);
+    throwError(`The provided value must be an instance of a DOM Node but got ${stringify(node)}`);
   }
 }
 function assertElement(node) {
   if (!(node instanceof Element)) {
-    throwError2(`The provided value must be an element but got ${stringify(node)}`);
+    throwError(`The provided value must be an element but got ${stringify(node)}`);
   }
 }
 function assertIndexInRange(arr, index) {
   assertDefined(arr, "Array must be defined.");
   const maxLen = arr.length;
   if (index < 0 || index >= maxLen) {
-    throwError2(`Index expected to be less than ${maxLen} but got ${index}`);
+    throwError(`Index expected to be less than ${maxLen} but got ${index}`);
   }
 }
 function assertOneOf(value, ...validValues) {
   if (validValues.indexOf(value) !== -1) return true;
-  throwError2(`Expected value to be one of ${JSON.stringify(validValues)} but was ${JSON.stringify(value)}.`);
+  throwError(`Expected value to be one of ${JSON.stringify(validValues)} but was ${JSON.stringify(value)}.`);
 }
 function assertNotReactive(fn) {
   if (getActiveConsumer() !== null) {
-    throwError2(`${fn}() should never be called in a reactive context.`);
+    throwError(`${fn}() should never be called in a reactive context.`);
   }
 }
 function ɵɵdefineInjectable(opts) {
@@ -4138,28 +1997,28 @@ var InjectionToken = class {
 };
 var _injectorProfilerContext;
 function getInjectorProfilerContext() {
-  !ngDevMode && throwError2("getInjectorProfilerContext should never be called in production mode");
+  !ngDevMode && throwError("getInjectorProfilerContext should never be called in production mode");
   return _injectorProfilerContext;
 }
 function setInjectorProfilerContext(context) {
-  !ngDevMode && throwError2("setInjectorProfilerContext should never be called in production mode");
+  !ngDevMode && throwError("setInjectorProfilerContext should never be called in production mode");
   const previous = _injectorProfilerContext;
   _injectorProfilerContext = context;
   return previous;
 }
 var injectorProfilerCallback = null;
 var setInjectorProfiler = (injectorProfiler2) => {
-  !ngDevMode && throwError2("setInjectorProfiler should never be called in production mode");
+  !ngDevMode && throwError("setInjectorProfiler should never be called in production mode");
   injectorProfilerCallback = injectorProfiler2;
 };
 function injectorProfiler(event) {
-  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError("Injector profiler should never be called in production mode");
   if (injectorProfilerCallback != null) {
     injectorProfilerCallback(event);
   }
 }
 function emitProviderConfiguredEvent(eventProvider, isViewProvider = false) {
-  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError("Injector profiler should never be called in production mode");
   let token;
   if (typeof eventProvider === "function") {
     token = eventProvider;
@@ -4183,7 +2042,7 @@ function emitProviderConfiguredEvent(eventProvider, isViewProvider = false) {
   });
 }
 function emitInstanceCreatedByInjectorEvent(instance) {
-  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError("Injector profiler should never be called in production mode");
   injectorProfiler({
     type: 1,
     context: getInjectorProfilerContext(),
@@ -4193,7 +2052,7 @@ function emitInstanceCreatedByInjectorEvent(instance) {
   });
 }
 function emitInjectEvent(token, value, flags) {
-  !ngDevMode && throwError2("Injector profiler should never be called in production mode");
+  !ngDevMode && throwError("Injector profiler should never be called in production mode");
   injectorProfiler({
     type: 0,
     context: getInjectorProfilerContext(),
@@ -4205,7 +2064,7 @@ function emitInjectEvent(token, value, flags) {
   });
 }
 function runInInjectorProfilerContext(injector, token, callback) {
-  !ngDevMode && throwError2("runInInjectorProfilerContext should never be called in production mode");
+  !ngDevMode && throwError("runInInjectorProfilerContext should never be called in production mode");
   const prevInjectContext = setInjectorProfilerContext({
     injector,
     token
@@ -6065,28 +3924,28 @@ function assertTNodeForTView(tNode, tView) {
       return;
     }
   }
-  throwError2("This TNode does not belong to this TView.");
+  throwError("This TNode does not belong to this TView.");
 }
 function assertTNode(tNode) {
   assertDefined(tNode, "TNode must be defined");
   if (!(tNode && typeof tNode === "object" && tNode.hasOwnProperty("directiveStylingLast"))) {
-    throwError2("Not of type TNode, got: " + tNode);
+    throwError("Not of type TNode, got: " + tNode);
   }
 }
 function assertTIcu(tIcu) {
   assertDefined(tIcu, "Expected TIcu to be defined");
   if (!(typeof tIcu.currentCaseLViewIndex === "number")) {
-    throwError2("Object is not of TIcu type.");
+    throwError("Object is not of TIcu type.");
   }
 }
 function assertComponentType(actual, msg = "Type passed in is not ComponentType, it does not have 'ɵcmp' property.") {
   if (!getComponentDef(actual)) {
-    throwError2(msg);
+    throwError(msg);
   }
 }
 function assertNgModuleType(actual, msg = "Type passed in is not NgModuleType, it does not have 'ɵmod' property.") {
   if (!getNgModuleDef(actual)) {
-    throwError2(msg);
+    throwError(msg);
   }
 }
 function assertHasParent(tNode) {
@@ -6112,7 +3971,7 @@ function assertFirstUpdatePass(tView, errMessage) {
 }
 function assertDirectiveDef(obj) {
   if (obj.type === void 0 || obj.selectors == void 0 || obj.inputs === void 0) {
-    throwError2(`Expected a DirectiveDef/ComponentDef and this object does not seem to have the expected shape.`);
+    throwError(`Expected a DirectiveDef/ComponentDef and this object does not seem to have the expected shape.`);
   }
 }
 function assertIndexInDeclRange(tView, index) {
@@ -6124,7 +3983,7 @@ function assertIndexInExpandoRange(lView, index) {
 }
 function assertBetween(lower, upper, index) {
   if (!(lower <= index && index < upper)) {
-    throwError2(`Index out of range (expecting ${lower} <= ${index} < ${upper})`);
+    throwError(`Index out of range (expecting ${lower} <= ${index} < ${upper})`);
   }
 }
 function assertProjectionSlots(lView, errMessage) {
@@ -6470,15 +4329,15 @@ function getContextLView() {
   return contextLView;
 }
 function isInCheckNoChangesMode() {
-  !ngDevMode && throwError2("Must never be called in production mode");
+  !ngDevMode && throwError("Must never be called in production mode");
   return _checkNoChangesMode !== CheckNoChangesMode.Off;
 }
 function isExhaustiveCheckNoChanges() {
-  !ngDevMode && throwError2("Must never be called in production mode");
+  !ngDevMode && throwError("Must never be called in production mode");
   return _checkNoChangesMode === CheckNoChangesMode.Exhaustive;
 }
 function setIsInCheckNoChangesMode(mode) {
-  !ngDevMode && throwError2("Must never be called in production mode");
+  !ngDevMode && throwError("Must never be called in production mode");
   _checkNoChangesMode = mode;
 }
 function isRefreshingViews() {
@@ -6855,12 +4714,12 @@ function hasStyleInput(tNode) {
 function assertTNodeType(tNode, expectedTypes, message) {
   assertDefined(tNode, "should be called with a TNode");
   if ((tNode.type & expectedTypes) === 0) {
-    throwError2(message || `Expected [${toTNodeTypeAsString(expectedTypes)}] but got ${toTNodeTypeAsString(tNode.type)}.`);
+    throwError(message || `Expected [${toTNodeTypeAsString(expectedTypes)}] but got ${toTNodeTypeAsString(tNode.type)}.`);
   }
 }
 function assertPureTNodeType(type) {
   if (!(type === 2 || type === 1 || type === 4 || type === 8 || type === 32 || type === 16 || type === 64 || type === 128)) {
-    throwError2(`Expected TNodeType to have only a single type selected, but got ${toTNodeTypeAsString(type)}.`);
+    throwError(`Expected TNodeType to have only a single type selected, but got ${toTNodeTypeAsString(type)}.`);
   }
 }
 var NOT_FOUND_CHECK_ONLY_ELEMENT_INJECTOR = {};
@@ -7721,13 +5580,13 @@ var EventEmitter_ = class extends Subject {
   }
 };
 var EventEmitter = EventEmitter_;
-function noop2(...args) {
+function noop(...args) {
 }
 function scheduleCallbackWithRafRace(callback) {
   let timeoutId;
   let animationFrameId;
   function cleanup() {
-    callback = noop2;
+    callback = noop;
     try {
       if (animationFrameId !== void 0 && typeof cancelAnimationFrame === "function") {
         cancelAnimationFrame(animationFrameId);
@@ -7753,7 +5612,7 @@ function scheduleCallbackWithRafRace(callback) {
 function scheduleCallbackWithMicrotask(callback) {
   queueMicrotask(() => callback());
   return () => {
-    callback = noop2;
+    callback = noop;
   };
 }
 var AsyncStackTaggingZoneSpec = class {
@@ -7866,7 +5725,7 @@ var NgZone = class _NgZone {
    */
   runTask(fn, applyThis, applyArgs, name) {
     const zone = this._inner;
-    const task = zone.scheduleEventTask("NgZoneEvent: " + name, fn, EMPTY_PAYLOAD, noop2, noop2);
+    const task = zone.scheduleEventTask("NgZoneEvent: " + name, fn, EMPTY_PAYLOAD, noop, noop);
     try {
       return zone.runTask(task, applyThis, applyArgs);
     } finally {
@@ -9306,7 +7165,7 @@ function tagSet(tags) {
   for (const t of tags.split(",")) res[t] = true;
   return res;
 }
-function merge3(...sets) {
+function merge2(...sets) {
   const res = {};
   for (const s of sets) {
     for (const v in s) {
@@ -9318,14 +7177,14 @@ function merge3(...sets) {
 var VOID_ELEMENTS = tagSet("area,br,col,hr,img,wbr");
 var OPTIONAL_END_TAG_BLOCK_ELEMENTS = tagSet("colgroup,dd,dt,li,p,tbody,td,tfoot,th,thead,tr");
 var OPTIONAL_END_TAG_INLINE_ELEMENTS = tagSet("rp,rt");
-var OPTIONAL_END_TAG_ELEMENTS = merge3(OPTIONAL_END_TAG_INLINE_ELEMENTS, OPTIONAL_END_TAG_BLOCK_ELEMENTS);
-var BLOCK_ELEMENTS = merge3(OPTIONAL_END_TAG_BLOCK_ELEMENTS, tagSet("address,article,aside,blockquote,caption,center,del,details,dialog,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5,h6,header,hgroup,hr,ins,main,map,menu,nav,ol,pre,section,summary,table,ul"));
-var INLINE_ELEMENTS = merge3(OPTIONAL_END_TAG_INLINE_ELEMENTS, tagSet("a,abbr,acronym,audio,b,bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,picture,q,ruby,rp,rt,s,samp,small,source,span,strike,strong,sub,sup,time,track,tt,u,var,video"));
-var VALID_ELEMENTS = merge3(VOID_ELEMENTS, BLOCK_ELEMENTS, INLINE_ELEMENTS, OPTIONAL_END_TAG_ELEMENTS);
+var OPTIONAL_END_TAG_ELEMENTS = merge2(OPTIONAL_END_TAG_INLINE_ELEMENTS, OPTIONAL_END_TAG_BLOCK_ELEMENTS);
+var BLOCK_ELEMENTS = merge2(OPTIONAL_END_TAG_BLOCK_ELEMENTS, tagSet("address,article,aside,blockquote,caption,center,del,details,dialog,dir,div,dl,figure,figcaption,footer,h1,h2,h3,h4,h5,h6,header,hgroup,hr,ins,main,map,menu,nav,ol,pre,section,summary,table,ul"));
+var INLINE_ELEMENTS = merge2(OPTIONAL_END_TAG_INLINE_ELEMENTS, tagSet("a,abbr,acronym,audio,b,bdi,bdo,big,br,cite,code,del,dfn,em,font,i,img,ins,kbd,label,map,mark,picture,q,ruby,rp,rt,s,samp,small,source,span,strike,strong,sub,sup,time,track,tt,u,var,video"));
+var VALID_ELEMENTS = merge2(VOID_ELEMENTS, BLOCK_ELEMENTS, INLINE_ELEMENTS, OPTIONAL_END_TAG_ELEMENTS);
 var URI_ATTRS = tagSet("background,cite,href,itemtype,longdesc,poster,src,xlink:href");
 var HTML_ATTRS = tagSet("abbr,accesskey,align,alt,autoplay,axis,bgcolor,border,cellpadding,cellspacing,class,clear,color,cols,colspan,compact,controls,coords,datetime,default,dir,download,face,headers,height,hidden,hreflang,hspace,ismap,itemscope,itemprop,kind,label,lang,language,loop,media,muted,nohref,nowrap,open,preload,rel,rev,role,rows,rowspan,rules,scope,scrolling,shape,size,sizes,span,srclang,srcset,start,summary,tabindex,target,title,translate,type,usemap,valign,value,vspace,width");
 var ARIA_ATTRS = tagSet("aria-activedescendant,aria-atomic,aria-autocomplete,aria-busy,aria-checked,aria-colcount,aria-colindex,aria-colspan,aria-controls,aria-current,aria-describedby,aria-details,aria-disabled,aria-dropeffect,aria-errormessage,aria-expanded,aria-flowto,aria-grabbed,aria-haspopup,aria-hidden,aria-invalid,aria-keyshortcuts,aria-label,aria-labelledby,aria-level,aria-live,aria-modal,aria-multiline,aria-multiselectable,aria-orientation,aria-owns,aria-placeholder,aria-posinset,aria-pressed,aria-readonly,aria-relevant,aria-required,aria-roledescription,aria-rowcount,aria-rowindex,aria-rowspan,aria-selected,aria-setsize,aria-sort,aria-valuemax,aria-valuemin,aria-valuenow,aria-valuetext");
-var VALID_ATTRS = merge3(URI_ATTRS, HTML_ATTRS, ARIA_ATTRS);
+var VALID_ATTRS = merge2(URI_ATTRS, HTML_ATTRS, ARIA_ATTRS);
 var SKIP_TRAVERSING_CONTENT_IF_INVALID_ELEMENTS = tagSet("script,style,template");
 var SanitizingHtmlSerializer = class {
   constructor() {
@@ -9711,19 +7570,19 @@ function reportUnknownPropertyError(message) {
   }
 }
 function getDeclarationComponentDef(lView) {
-  !ngDevMode && throwError2("Must never be called in production mode");
+  !ngDevMode && throwError("Must never be called in production mode");
   const declarationLView = lView[DECLARATION_COMPONENT_VIEW];
   const context = declarationLView[CONTEXT];
   if (!context) return null;
   return context.constructor ? getComponentDef(context.constructor) : null;
 }
 function isHostComponentStandalone(lView) {
-  !ngDevMode && throwError2("Must never be called in production mode");
+  !ngDevMode && throwError("Must never be called in production mode");
   const componentDef = getDeclarationComponentDef(lView);
   return !!componentDef?.standalone;
 }
 function getTemplateLocationDetails(lView) {
-  !ngDevMode && throwError2("Must never be called in production mode");
+  !ngDevMode && throwError("Must never be called in production mode");
   const hostComponentDef = getDeclarationComponentDef(lView);
   const componentClassName = hostComponentDef?.type?.name;
   return componentClassName ? ` (used in the '${componentClassName}' component template)` : "";
@@ -12511,7 +10370,7 @@ function getTIcu(tView, index) {
   const value = tView.data[index];
   if (value === null || typeof value === "string") return null;
   if (ngDevMode && !(value.hasOwnProperty("tView") || value.hasOwnProperty("currentCaseLViewIndex"))) {
-    throwError2("We expect to get 'null'|'TIcu'|'TIcuContainer', but got: " + value);
+    throwError("We expect to get 'null'|'TIcu'|'TIcuContainer', but got: " + value);
   }
   const tIcu = value.hasOwnProperty("currentCaseLViewIndex") ? value : value.value;
   ngDevMode && assertTIcu(tIcu);
@@ -12713,8 +10572,8 @@ function locateNextRNode(hydrationInfo, tView, lView, tNode) {
   }
   return native;
 }
-function siblingAfter(skip2, from2) {
-  let currentNode = from2;
+function siblingAfter(skip2, from) {
+  let currentNode = from;
   for (let i = 0; i < skip2; i++) {
     ngDevMode && validateSiblingNodeExists(currentNode);
     currentNode = currentNode.nextSibling;
@@ -12732,14 +10591,14 @@ function stringifyNavigationInstructions(instructions) {
   }
   return container.join(".");
 }
-function navigateToNode(from2, instructions) {
-  let node = from2;
+function navigateToNode(from, instructions) {
+  let node = from;
   for (let i = 0; i < instructions.length; i += 2) {
     const step = instructions[i];
     const repeat2 = instructions[i + 1];
     for (let r = 0; r < repeat2; r++) {
       if (ngDevMode && !node) {
-        throw nodeNotFoundAtPathError(from2, stringifyNavigationInstructions(instructions));
+        throw nodeNotFoundAtPathError(from, stringifyNavigationInstructions(instructions));
       }
       switch (step) {
         case NodeNavigationStep.FirstChild:
@@ -12752,7 +10611,7 @@ function navigateToNode(from2, instructions) {
     }
   }
   if (ngDevMode && !node) {
-    throw nodeNotFoundAtPathError(from2, stringifyNavigationInstructions(instructions));
+    throw nodeNotFoundAtPathError(from, stringifyNavigationInstructions(instructions));
   }
   return node;
 }
@@ -12799,8 +10658,8 @@ function navigateBetweenSiblings(start, finish) {
   }
   return node == null ? null : nav;
 }
-function calcPathBetween(from2, to, fromNodeName) {
-  const path = navigateBetween(from2, to);
+function calcPathBetween(from, to, fromNodeName) {
+  const path = navigateBetween(from, to);
   return path === null ? null : compressNodeLocation(fromNodeName, path);
 }
 function calcPathForNode(tNode, lView, excludedParentNodes) {
@@ -13621,9 +11480,9 @@ function toRefArray(map2, isInputMap) {
     if (value === void 0) {
       continue;
     }
-    const isArray4 = Array.isArray(value);
-    const propName = isArray4 ? value[0] : value;
-    const flags = isArray4 ? value[1] : InputFlags.None;
+    const isArray = Array.isArray(value);
+    const propName = isArray ? value[0] : value;
+    const flags = isArray ? value[1] : InputFlags.None;
     if (isInputMap) {
       array.push({
         propName,
@@ -13988,7 +11847,7 @@ var R3ViewContainerRef = class ViewContainerRef2 extends VE_ViewContainerRef {
       }
       const options = indexOrOptions || {};
       if (ngDevMode && options.environmentInjector && options.ngModuleRef) {
-        throwError2(`Cannot pass both environmentInjector and ngModuleRef options to createComponent().`);
+        throwError(`Cannot pass both environmentInjector and ngModuleRef options to createComponent().`);
       }
       index = options.index;
       injector = options.injector;
@@ -14382,7 +12241,7 @@ function createSpecialToken(lView, tNode, read) {
     );
     return createContainerRef(tNode, lView);
   } else {
-    ngDevMode && throwError2(`Special token to read should be one of ElementRef, TemplateRef or ViewContainerRef but got ${stringify(read)}.`);
+    ngDevMode && throwError(`Special token to read should be one of ElementRef, TemplateRef or ViewContainerRef but got ${stringify(read)}.`);
   }
 }
 function materializeViewResults(tView, lView, tQuery, queryIndex) {
@@ -14782,10 +12641,10 @@ function clearResolutionOfComponentResourcesQueue() {
   componentResourceResolutionQueue = /* @__PURE__ */ new Map();
   return old;
 }
-function restoreComponentResolutionQueue(queue2) {
+function restoreComponentResolutionQueue(queue) {
   componentDefPendingResolution.clear();
-  queue2.forEach((_, type) => componentDefPendingResolution.add(type));
-  componentResourceResolutionQueue = queue2;
+  queue.forEach((_, type) => componentDefPendingResolution.add(type));
+  componentResourceResolutionQueue = queue;
 }
 function isComponentResourceResolutionQueueEmpty() {
   return componentResourceResolutionQueue.size === 0;
@@ -15017,9 +12876,9 @@ function findHostDirectiveDefs(currentDef, matchedDefs, hostDirectiveDefs) {
   if (currentDef.hostDirectives !== null) {
     for (const configOrFn of currentDef.hostDirectives) {
       if (typeof configOrFn === "function") {
-        const resolved2 = configOrFn();
-        for (const config2 of resolved2) {
-          trackHostDirectiveDef(createHostDirectiveDef(config2), matchedDefs, hostDirectiveDefs);
+        const resolved = configOrFn();
+        for (const config of resolved) {
+          trackHostDirectiveDef(createHostDirectiveDef(config), matchedDefs, hostDirectiveDefs);
         }
       } else {
         trackHostDirectiveDef(configOrFn, matchedDefs, hostDirectiveDefs);
@@ -15037,15 +12896,15 @@ function trackHostDirectiveDef(def, matchedDefs, hostDirectiveDefs) {
   hostDirectiveDefs.set(hostDirectiveDef, def);
   matchedDefs.push(hostDirectiveDef);
 }
-function createHostDirectiveDef(config2) {
-  return typeof config2 === "function" ? {
-    directive: resolveForwardRef(config2),
+function createHostDirectiveDef(config) {
+  return typeof config === "function" ? {
+    directive: resolveForwardRef(config),
     inputs: EMPTY_OBJ,
     outputs: EMPTY_OBJ
   } : {
-    directive: resolveForwardRef(config2.directive),
-    inputs: bindingArrayToMap(config2.inputs),
-    outputs: bindingArrayToMap(config2.outputs)
+    directive: resolveForwardRef(config.directive),
+    inputs: bindingArrayToMap(config.inputs),
+    outputs: bindingArrayToMap(config.outputs)
   };
 }
 function bindingArrayToMap(bindings) {
@@ -15174,19 +13033,19 @@ function createNgModuleRefWithProviders(moduleType, parentInjector, additionalPr
   return new NgModuleRef(moduleType, parentInjector, additionalProviders, false);
 }
 var EnvironmentNgModuleRefAdapter = class extends NgModuleRef$1 {
-  constructor(config2) {
+  constructor(config) {
     super();
     this.componentFactoryResolver = new ComponentFactoryResolver(this);
     this.instance = null;
-    const injector = new R3Injector([...config2.providers, {
+    const injector = new R3Injector([...config.providers, {
       provide: NgModuleRef$1,
       useValue: this
     }, {
       provide: ComponentFactoryResolver$1,
       useValue: this.componentFactoryResolver
-    }], config2.parent || getNullInjector(), config2.debugName, /* @__PURE__ */ new Set(["environment"]));
+    }], config.parent || getNullInjector(), config.debugName, /* @__PURE__ */ new Set(["environment"]));
     this.injector = injector;
-    if (config2.runEnvironmentInitializers) {
+    if (config.runEnvironmentInitializers) {
       injector.resolveInjectorInitializers();
     }
   }
@@ -15258,9 +13117,9 @@ function iterateListLike(obj, fn) {
       fn(obj[i]);
     }
   } else {
-    const iterator2 = obj[Symbol.iterator]();
+    const iterator = obj[Symbol.iterator]();
     let item;
-    while (!(item = iterator2.next()).done) {
+    while (!(item = iterator.next()).done) {
       fn(item.value);
     }
   }
@@ -15683,7 +13542,7 @@ function getTemplateIndexForState(newState, hostLView, tNode) {
     case DeferBlockState.Placeholder:
       return tDetails.placeholderTmplIndex;
     default:
-      ngDevMode && throwError2(`Unexpected defer block state: ${newState}`);
+      ngDevMode && throwError(`Unexpected defer block state: ${newState}`);
       return null;
   }
 }
@@ -16100,10 +13959,10 @@ var TimerScheduler = class _TimerScheduler {
 var DEFER_BLOCK_DEPENDENCY_INTERCEPTOR = new InjectionToken("DEFER_BLOCK_DEPENDENCY_INTERCEPTOR");
 var DEFER_BLOCK_CONFIG = new InjectionToken(ngDevMode ? "DEFER_BLOCK_CONFIG" : "");
 function shouldTriggerDeferBlock(injector) {
-  const config2 = injector.get(DEFER_BLOCK_CONFIG, null, {
+  const config = injector.get(DEFER_BLOCK_CONFIG, null, {
     optional: true
   });
-  if (config2?.behavior === DeferBlockBehavior.Manual) {
+  if (config?.behavior === DeferBlockBehavior.Manual) {
     return false;
   }
   return isPlatformBrowser(injector);
@@ -16596,7 +14455,7 @@ function triggerDeferBlock(lView, tNode) {
       break;
     default:
       if (ngDevMode) {
-        throwError2("Unknown defer block state");
+        throwError("Unknown defer block state");
       }
   }
 }
@@ -17060,7 +14919,7 @@ function consumeQuotedText(text, quoteCharCode, startIndex, endIndex) {
 }
 function malformedStyleError(text, expecting, index) {
   ngDevMode && assertEqual(typeof text === "string", true, "String expected here");
-  throw throwError2(`Malformed style at location ${index} in string '` + text.substring(0, index) + "[>>" + text.substring(index, index + 1) + "<<]" + text.slice(index + 1) + `'. Expecting '${expecting}'.`);
+  throw throwError(`Malformed style at location ${index} in string '` + text.substring(0, index) + "[>>" + text.substring(index, index + 1) + "<<]" + text.slice(index + 1) + `'. Expecting '${expecting}'.`);
 }
 function ɵɵproperty(propName, value, sanitizer) {
   const lView = getLView();
@@ -17268,7 +15127,7 @@ function toStylingKeyValueArray(keyValueArraySet2, stringParser, value) {
   } else if (typeof unwrappedValue === "string") {
     stringParser(styleKeyValueArray, unwrappedValue);
   } else {
-    ngDevMode && throwError2("Unsupported styling type " + typeof unwrappedValue + ": " + unwrappedValue);
+    ngDevMode && throwError("Unsupported styling type " + typeof unwrappedValue + ": " + unwrappedValue);
   }
   return styleKeyValueArray;
 }
@@ -18425,7 +16284,7 @@ function applyMutableOpCodes(tView, mutableOpCodes, lView, anchorRNode) {
           }
           break;
         default:
-          ngDevMode && throwError2(`Unable to determine the type of mutate operation for "${opCode}"`);
+          ngDevMode && throwError(`Unable to determine the type of mutate operation for "${opCode}"`);
       }
     }
   }
@@ -20295,7 +18154,7 @@ function ɵɵpipe(index, pipeName) {
 function getPipeDef(name, registry) {
   if (registry) {
     if (ngDevMode) {
-      const pipes = registry.filter((pipe2) => pipe2.name === name);
+      const pipes = registry.filter((pipe) => pipe.name === name);
       if (pipes.length > 1) {
         console.warn(formatRuntimeError(313, getMultipleMatchingPipesMessage(name)));
       }
@@ -20896,7 +18755,7 @@ function setScopeOnDeclaredComponents(moduleType, ngModule) {
 }
 function patchComponentDefWithScope(componentDef, transitiveScopes) {
   componentDef.directiveDefs = () => Array.from(transitiveScopes.compilation.directives).map((dir) => dir.hasOwnProperty(NG_COMP_DEF) ? getComponentDef(dir) : getDirectiveDef(dir)).filter((def) => !!def);
-  componentDef.pipeDefs = () => Array.from(transitiveScopes.compilation.pipes).map((pipe2) => getPipeDef$1(pipe2));
+  componentDef.pipeDefs = () => Array.from(transitiveScopes.compilation.pipes).map((pipe) => getPipeDef$1(pipe));
   componentDef.schemas = transitiveScopes.schemas;
   componentDef.tView = null;
 }
@@ -21163,10 +19022,10 @@ function getStandaloneDefFunctions(type, imports) {
           seen.add(dep);
           if (!!getNgModuleDef(dep)) {
             const scope = transitiveScopesFor(dep);
-            for (const pipe2 of scope.exported.pipes) {
-              const def = getPipeDef$1(pipe2);
-              if (def && !seen.has(pipe2)) {
-                seen.add(pipe2);
+            for (const pipe of scope.exported.pipes) {
+              const def = getPipeDef$1(pipe);
+              if (def && !seen.has(pipe)) {
+                seen.add(pipe);
                 cachedPipeDefs.push(def);
               }
             }
@@ -21543,7 +19402,7 @@ function handleInjectorProfilerEvent(injectorProfilerEvent) {
 function handleInjectEvent(context, data) {
   const diResolver = getDIResolver(context.injector);
   if (diResolver === null) {
-    throwError2("An Inject event must be run within an injection context.");
+    throwError("An Inject event must be run within an injection context.");
   }
   const diResolverToInstantiatedToken = frameworkDIDebugData.resolverToTokenToDependencies;
   if (!diResolverToInstantiatedToken.has(diResolver)) {
@@ -21581,7 +19440,7 @@ function handleInjectEvent(context, data) {
 }
 function getNodeInjectorContext(injector) {
   if (!(injector instanceof NodeInjector)) {
-    throwError2("getNodeInjectorContext must be called with a NodeInjector");
+    throwError("getNodeInjectorContext must be called with a NodeInjector");
   }
   const lView = getNodeInjectorLView(injector);
   const tNode = getNodeInjectorTNode(injector);
@@ -21599,7 +19458,7 @@ function handleInstanceCreatedByInjectorEvent(context, data) {
     value
   } = data;
   if (getDIResolver(context.injector) === null) {
-    throwError2("An InjectorCreatedInstance event must be run within an injection context.");
+    throwError("An InjectorCreatedInstance event must be run within an injection context.");
   }
   let standaloneComponent = void 0;
   if (typeof value === "object") {
@@ -21637,7 +19496,7 @@ function handleProviderConfiguredEvent(context, data) {
     diResolver = context.injector;
   }
   if (diResolver === null) {
-    throwError2("A ProviderConfigured event must be run within an injection context.");
+    throwError("A ProviderConfigured event must be run within an injection context.");
   }
   if (!resolverToProviders.has(diResolver)) {
     resolverToProviders.set(diResolver, []);
@@ -21857,7 +19716,7 @@ function getInjectorProviders(injector) {
   } else if (injector instanceof EnvironmentInjector) {
     return getEnvironmentInjectorProviders(injector);
   }
-  throwError2("getInjectorProviders only supports NodeInjector and EnvironmentInjector");
+  throwError("getInjectorProviders only supports NodeInjector and EnvironmentInjector");
 }
 function getInjectorMetadata(injector) {
   if (injector instanceof NodeInjector) {
@@ -21896,7 +19755,7 @@ function getInjectorResolutionPathHelper(injector, resolutionPath) {
       if (firstInjector instanceof NodeInjector) {
         const moduleInjector = getModuleInjectorOfNodeInjector(firstInjector);
         if (moduleInjector === null) {
-          throwError2("NodeInjector must have some connection to the module injector tree");
+          throwError("NodeInjector must have some connection to the module injector tree");
         }
         resolutionPath.push(moduleInjector);
         getInjectorResolutionPathHelper(moduleInjector, resolutionPath);
@@ -21927,7 +19786,7 @@ function getInjectorParent(injector) {
   } else if (injector instanceof ChainedInjector) {
     return injector.parentInjector;
   } else {
-    throwError2("getInjectorParent only support injectors of type R3Injector, NodeInjector, NullInjector");
+    throwError("getInjectorParent only support injectors of type R3Injector, NodeInjector, NullInjector");
   }
   const parentLocation = getParentInjectorLocation(tNode, lView);
   if (hasParentInjector(parentLocation)) {
@@ -21953,12 +19812,12 @@ function getModuleInjectorOfNodeInjector(injector) {
   if (injector instanceof NodeInjector) {
     lView = getNodeInjectorLView(injector);
   } else {
-    throwError2("getModuleInjectorOfNodeInjector must be called with a NodeInjector");
+    throwError("getModuleInjectorOfNodeInjector must be called with a NodeInjector");
   }
   const inj = lView[INJECTOR];
   const moduleInjector = inj instanceof ChainedInjector ? inj.parentInjector : inj.parent;
   if (!moduleInjector) {
-    throwError2("NodeInjector must have some connection to the module injector tree");
+    throwError("NodeInjector must have some connection to the module injector tree");
   }
   return moduleInjector;
 }
@@ -22139,7 +19998,7 @@ var Testability = class _Testability {
    * @param provider The name of binding variable
    * @param exactMatch Whether using exactMatch
    */
-  findProviders(using2, provider, exactMatch) {
+  findProviders(using, provider, exactMatch) {
     return [];
   }
   static {
@@ -22247,7 +20106,7 @@ function setTestabilityGetter(getter) {
   _testabilityGetter = getter;
 }
 var _testabilityGetter;
-function isPromise2(obj) {
+function isPromise(obj) {
   return !!obj && typeof obj.then === "function";
 }
 function isSubscribable(obj) {
@@ -22277,7 +20136,7 @@ var ApplicationInitStatus = class _ApplicationInitStatus {
     const asyncInitPromises = [];
     for (const appInits of this.appInits) {
       const initResult = appInits();
-      if (isPromise2(initResult)) {
+      if (isPromise(initResult)) {
         asyncInitPromises.push(initResult);
       } else if (isSubscribable(initResult)) {
         const observableAsPromise = new Promise((resolve, reject) => {
@@ -22346,7 +20205,7 @@ var MAXIMUM_REFRESH_RERUNS = 10;
 function _callAndReportToErrorHandler(errorHandler, ngZone, callback) {
   try {
     const result = callback();
-    if (isPromise2(result)) {
+    if (isPromise(result)) {
       return result.catch((e) => {
         ngZone.runOutsideAngular(() => errorHandler.handleError(e));
         throw e;
@@ -23410,22 +21269,22 @@ function logOversizedImageWarning(src) {
   console.warn(formatRuntimeError(-913, `An image with src ${src} has intrinsic file dimensions much larger than its rendered size. This can negatively impact application loading performance. For more information about addressing or disabling this warning, see https://angular.dev/errors/NG0913`));
 }
 var PLATFORM_DESTROY_LISTENERS = new InjectionToken(ngDevMode ? "PlatformDestroyListeners" : "");
-function isApplicationBootstrapConfig(config2) {
-  return !config2.moduleRef;
+function isApplicationBootstrapConfig(config) {
+  return !config.moduleRef;
 }
-function bootstrap(config2) {
-  const envInjector = isApplicationBootstrapConfig(config2) ? config2.r3Injector : config2.moduleRef.injector;
+function bootstrap(config) {
+  const envInjector = isApplicationBootstrapConfig(config) ? config.r3Injector : config.moduleRef.injector;
   const ngZone = envInjector.get(NgZone);
   return ngZone.run(() => {
-    if (isApplicationBootstrapConfig(config2)) {
-      config2.r3Injector.resolveInjectorInitializers();
+    if (isApplicationBootstrapConfig(config)) {
+      config.r3Injector.resolveInjectorInitializers();
     } else {
-      config2.moduleRef.resolveInjectorInitializers();
+      config.moduleRef.resolveInjectorInitializers();
     }
     const exceptionHandler = envInjector.get(ErrorHandler, null);
     if (typeof ngDevMode === "undefined" || ngDevMode) {
       if (exceptionHandler === null) {
-        const errorMessage = isApplicationBootstrapConfig(config2) ? "No `ErrorHandler` found in the Dependency Injection tree." : "No ErrorHandler. Is platform module (BrowserModule) included";
+        const errorMessage = isApplicationBootstrapConfig(config) ? "No `ErrorHandler` found in the Dependency Injection tree." : "No ErrorHandler. Is platform module (BrowserModule) included";
         throw new RuntimeError(402, errorMessage);
       }
       if (envInjector.get(PROVIDED_ZONELESS) && envInjector.get(PROVIDED_NG_ZONE)) {
@@ -23440,20 +21299,20 @@ function bootstrap(config2) {
         }
       });
     });
-    if (isApplicationBootstrapConfig(config2)) {
+    if (isApplicationBootstrapConfig(config)) {
       const destroyListener = () => envInjector.destroy();
-      const onPlatformDestroyListeners = config2.platformInjector.get(PLATFORM_DESTROY_LISTENERS);
+      const onPlatformDestroyListeners = config.platformInjector.get(PLATFORM_DESTROY_LISTENERS);
       onPlatformDestroyListeners.add(destroyListener);
       envInjector.onDestroy(() => {
         onErrorSubscription.unsubscribe();
         onPlatformDestroyListeners.delete(destroyListener);
       });
     } else {
-      const destroyListener = () => config2.moduleRef.destroy();
-      const onPlatformDestroyListeners = config2.platformInjector.get(PLATFORM_DESTROY_LISTENERS);
+      const destroyListener = () => config.moduleRef.destroy();
+      const onPlatformDestroyListeners = config.platformInjector.get(PLATFORM_DESTROY_LISTENERS);
       onPlatformDestroyListeners.add(destroyListener);
-      config2.moduleRef.onDestroy(() => {
-        remove(config2.allPlatformModules, config2.moduleRef);
+      config.moduleRef.onDestroy(() => {
+        remove(config.allPlatformModules, config.moduleRef);
         onErrorSubscription.unsubscribe();
         onPlatformDestroyListeners.delete(destroyListener);
       });
@@ -23468,15 +21327,15 @@ function bootstrap(config2) {
           const imagePerformanceService = envInjector.get(ImagePerformanceWarning);
           imagePerformanceService.start();
         }
-        if (isApplicationBootstrapConfig(config2)) {
+        if (isApplicationBootstrapConfig(config)) {
           const appRef = envInjector.get(ApplicationRef);
-          if (config2.rootComponent !== void 0) {
-            appRef.bootstrap(config2.rootComponent);
+          if (config.rootComponent !== void 0) {
+            appRef.bootstrap(config.rootComponent);
           }
           return appRef;
         } else {
-          moduleDoBootstrap(config2.moduleRef, config2.allPlatformModules);
-          return config2.moduleRef;
+          moduleDoBootstrap(config.moduleRef, config.allPlatformModules);
+          return config.moduleRef;
         }
       });
     });
@@ -23745,7 +21604,7 @@ var DebugNgZoneForCheckNoChanges = class extends NgZone {
     }
   }
 };
-function exhaustiveCheckNoChangesInterval(interval2, checkNoChangesMode) {
+function exhaustiveCheckNoChangesInterval(interval, checkNoChangesMode) {
   return {
     provide: ENVIRONMENT_INITIALIZER,
     multi: true,
@@ -23773,7 +21632,7 @@ function exhaustiveCheckNoChangesInterval(interval2, checkNoChangesMode) {
                 }
               }
               scheduleCheckNoChanges();
-            }, interval2);
+            }, interval);
           });
         }
         scheduleCheckNoChanges();
@@ -25301,13 +23160,13 @@ var WATCH_NODE2 = (() => {
 })();
 function setAlternateWeakRefImpl(impl) {
 }
-function internalCreateApplication(config2) {
+function internalCreateApplication(config) {
   try {
     const {
       rootComponent,
       appProviders,
       platformProviders
-    } = config2;
+    } = config;
     if ((typeof ngDevMode === "undefined" || ngDevMode) && rootComponent !== void 0) {
       assertStandaloneComponentType(rootComponent);
     }
@@ -26058,12 +23917,12 @@ var ZoneAwareEffectScheduler = class {
     if (!this.queues.has(zone)) {
       this.queues.set(zone, /* @__PURE__ */ new Set());
     }
-    const queue2 = this.queues.get(zone);
-    if (queue2.has(handle)) {
+    const queue = this.queues.get(zone);
+    if (queue.has(handle)) {
       return;
     }
     this.queuedEffectCount++;
-    queue2.add(handle);
+    queue.add(handle);
   }
   /**
    * Run all scheduled effects.
@@ -26073,18 +23932,18 @@ var ZoneAwareEffectScheduler = class {
    */
   flush() {
     while (this.queuedEffectCount > 0) {
-      for (const [zone, queue2] of this.queues) {
+      for (const [zone, queue] of this.queues) {
         if (zone === null) {
-          this.flushQueue(queue2);
+          this.flushQueue(queue);
         } else {
-          zone.run(() => this.flushQueue(queue2));
+          zone.run(() => this.flushQueue(queue));
         }
       }
     }
   }
-  flushQueue(queue2) {
-    for (const handle of queue2) {
-      queue2.delete(handle);
+  flushQueue(queue) {
+    for (const handle of queue) {
+      queue.delete(handle);
       this.queuedEffectCount--;
       handle.run();
     }
@@ -26189,43 +24048,6 @@ if (typeof ngDevMode !== "undefined" && ngDevMode) {
 
 export {
   SIGNAL,
-  refCount,
-  ConnectableObservable,
-  BehaviorSubject,
-  EMPTY,
-  from,
-  of,
-  throwError,
-  isObservable,
-  EmptyError,
-  TimeoutError,
-  timeout,
-  map,
-  combineLatest,
-  mergeMap,
-  mergeAll,
-  concat,
-  defer,
-  forkJoin,
-  timer,
-  filter,
-  catchError,
-  concatMap,
-  defaultIfEmpty,
-  take,
-  mapTo,
-  distinctUntilChanged,
-  finalize,
-  first,
-  takeLast,
-  last2 as last,
-  retry,
-  retryWhen,
-  scan,
-  startWith,
-  switchMap,
-  takeUntil,
-  tap,
   XSS_SECURITY_URL,
   RuntimeError,
   formatRuntimeError,
@@ -26608,7 +24430,7 @@ export {
   Testability,
   TestabilityRegistry,
   setTestabilityGetter,
-  isPromise2 as isPromise,
+  isPromise,
   isSubscribable,
   APP_INITIALIZER,
   ApplicationInitStatus,
@@ -26738,4 +24560,4 @@ export {
    * found in the LICENSE file at https://angular.dev/license
    *)
 */
-//# sourceMappingURL=chunk-OAIEQDY6.js.map
+//# sourceMappingURL=chunk-OJOPIVBA.js.map

@@ -124,13 +124,16 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.sseSubscription = this.sseService.getUpdates().subscribe({
       next: (update) => {
-        if (update.type === 'timer_approved') {
-          this.approveTask(update.timerId);
-        } else if (update.type === 'timer_rejected') {
-          this.rejectTask(update.timerId);
+        console.log('SSE update:', update);
+        if (update.timerId) {
+          if (update.status === 'approved') {
+            this.approveTask(update.timerId);
+          } else if (update.status === 'rejected') {
+            this.rejectTask(update.timerId);
+          }
         }
       },
-      error: (err) => console.error('SSE error:', err)
+      error: (err) => console.error('SSE connection error:', err)
     });
   }
 

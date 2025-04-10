@@ -1,4 +1,3 @@
-// src/app/services/sse.service.ts
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -6,22 +5,29 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class SseService {
-  private eventSource!: EventSource;
-
   getUpdates(): Observable<any> {
     return new Observable(observer => {
-      this.eventSource = new EventSource('/api/sse');
+      const eventSource = new EventSource('https://sq170.vercel.app/api/sse', {
+        withCredentials: false
+      });
 
-      this.eventSource.onmessage = (event) => {
-        observer.next(JSON.parse(event.data));
+      eventSource.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          observer.next(data);
+        } catch (e) {
+          console.error('Error parsing SSE data', e);
+        }
       };
 
-      this.eventSource.onerror = (error) => {
+      eventSource.onerror = (error) => {
+        console.error('SSE error:', error);
         observer.error(error);
+        eventSource.close();
       };
 
       return () => {
-        this.eventSource.close();
+        eventSource.close();
       };
     });
   }
