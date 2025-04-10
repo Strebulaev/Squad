@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { HttpClientModule } from '@angular/common/http';
+import { SseService } from '../services/sse.service';
 
 interface Timer {
   id: number;
@@ -31,7 +32,9 @@ interface Timer {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule] // Добавьте HttpClientModule
 })
+
 export class CrazyTimerComponent implements OnInit, OnDestroy {
+  private sseSubscription: any;
   private readonly TELEGRAM_BOT_TOKEN = '8181088924:AAFFumfMTW0j8qLzBq6Lwwv-bumI0804R-o';
   private readonly TELEGRAM_CHAT_ID = '670979713';
   private socket$: WebSocketSubject<any>;
@@ -91,7 +94,7 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     { top: '70%', right: '25%', rotate: -9 }
   ];
 
-  constructor(private http: HttpClient) {
+  constructor(private sseService: SseService, private http: HttpClient) {
     this.socket$ = webSocket('ws://localhost:8080');
 
     this.socket$.subscribe({
@@ -119,17 +122,22 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    // Проверка статусов каждые 5 секунд
-    setInterval(() => {
-      this.activeTimers.forEach(timer => {
-        if (timer.isPending) this.checkTimerStatus(timer.id);
-      });
-    }, 5000);
+    this.sseSubscription = this.sseService.getUpdates().subscribe({
+      next: (update) => {
+        if (update.type === 'timer_approved') {
+          this.approveTask(update.timerId);
+        } else if (update.type === 'timer_rejected') {
+          this.rejectTask(update.timerId);
+        }
+      },
+      error: (err) => console.error('SSE error:', err)
+    });
   }
 
   ngOnDestroy() {
-    this.socket$.complete();
-    this.clearAllIntervals();
+    if (this.sseSubscription) {
+      this.sseSubscription.unsubscribe();
+    }
   }
 
   private checkAdminStatus(): void {
@@ -285,6 +293,7 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
       }
       timer = this.activeTimers[timerIndex];
       console.log(`Timer ${timerId} found in active timers`);
+      this.http.post('/api/approve', { timerId }).subscribe();
     }
 
     timer.isApproved = true;
