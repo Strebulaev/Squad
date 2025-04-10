@@ -3,7 +3,7 @@ import {
   XhrFactory,
   isPlatformServer,
   parseCookieValue
-} from "./chunk-BSOZU3IN.js";
+} from "./chunk-H2L4GWM6.js";
 import {
   APP_BOOTSTRAP_LISTENER,
   ApplicationRef,
@@ -14,7 +14,6 @@ import {
   InjectionToken,
   NgModule,
   NgZone,
-  Observable,
   PLATFORM_ID,
   PendingTasks,
   RuntimeError,
@@ -40,7 +39,10 @@ import {
   ɵɵdefineInjector,
   ɵɵdefineNgModule,
   ɵɵinject
-} from "./chunk-UM4RL7GU.js";
+} from "./chunk-OAIEQDY6.js";
+import {
+  Observable
+} from "./chunk-X2J6GGPQ.js";
 import {
   __async,
   __objRest,
@@ -2371,4 +2373,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-AYS3NVXE.js.map
+//# sourceMappingURL=chunk-Y7AH3JAC.js.map

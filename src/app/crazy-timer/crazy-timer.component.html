@@ -35,6 +35,38 @@
       </div>
     </div>
 
+    <!-- Задания на проверку (только для админа) -->
+    <section class="pending-section" *ngIf="pendingTimers.length > 0 && isAdmin">
+      <h2 class="section-title">Задания на проверку ({{ pendingTimers.length }})</h2>
+
+      <div class="timers-grid">
+        <article *ngFor="let timer of pendingTimers" class="timer-card pending-card">
+          <header class="timer-header">
+            <h3>{{ timer.task }}</h3>
+            <span class="status-badge pending">⏳ Ожидает подтверждения</span>
+          </header>
+
+          <div class="timer-body">
+            <div class="time-display">
+              <span class="time-left">⏳ {{ timer.formattedTime }}</span>
+            </div>
+            <div class="difficulty-badge">
+              Сложность: {{ timer.difficulty }}🍪
+            </div>
+          </div>
+
+          <footer class="timer-footer">
+            <button (click)="approveTask(timer.id)" class="btn-approve">
+              ✅ Подтвердить
+            </button>
+            <button (click)="rejectTask(timer.id)" class="btn-reject">
+              ❌ Отклонить
+            </button>
+          </footer>
+        </article>
+      </div>
+    </section>
+
     <!-- Форма добавления таймера -->
     <main class="main-content">
       <form #timerForm="ngForm" (ngSubmit)="addTimer(timerForm)" class="timer-form">
@@ -107,6 +139,8 @@
                    [class.expiring]="timer.timeLeft < 30">
             <header class="timer-header">
               <h3>{{ timer.task }}</h3>
+              <span *ngIf="timer.isPending" class="status-badge pending">⏳ На проверке</span>
+              <span *ngIf="timer.isApproved" class="status-badge approved">✅ Подтверждено</span>
             </header>
 
             <div class="timer-body">
@@ -123,11 +157,19 @@
             </div>
 
             <footer class="timer-footer">
-              <button (click)="completeTimer(timer.id)"
-                      class="complete-button clown-button"
-                      [style.filter]="'hue-rotate(' + getRandomValue(0, 360) + 'deg)'">
+              <button *ngIf="!timer.isPending && !timer.isApproved"
+                      (click)="completeTimer(timer.id)"
+                      class="complete-button clown-button">
                 ✅ Завершить
               </button>
+              <div *ngIf="isAdmin && timer.isPending" class="admin-controls">
+                <button (click)="approveTask(timer.id)" class="btn-approve">
+                  ✅ Подтвердить
+                </button>
+                <button (click)="rejectTask(timer.id)" class="btn-reject">
+                  ❌ Отклонить
+                </button>
+              </div>
             </footer>
           </article>
         </div>

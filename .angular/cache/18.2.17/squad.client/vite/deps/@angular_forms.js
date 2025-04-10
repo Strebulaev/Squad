@@ -1,6 +1,6 @@
 import {
   getDOM
-} from "./chunk-BSOZU3IN.js";
+} from "./chunk-H2L4GWM6.js";
 import {
   ChangeDetectorRef,
   Directive,
@@ -19,7 +19,6 @@ import {
   RuntimeError,
   Self,
   SkipSelf,
-  Subject,
   Version,
   booleanAttribute,
   computed,
@@ -45,7 +44,10 @@ import {
   ɵɵdirectiveInject,
   ɵɵgetInheritedFactory,
   ɵɵlistener
-} from "./chunk-UM4RL7GU.js";
+} from "./chunk-OAIEQDY6.js";
+import {
+  Subject
+} from "./chunk-X2J6GGPQ.js";
 import {
   __spreadProps,
   __spreadValues

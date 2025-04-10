@@ -2,6 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { HttpClientModule } from '@angular/common/http';
 
 interface Timer {
   id: number;
@@ -17,6 +20,8 @@ interface Timer {
     transform: string;
     'z-index': number;
   };
+  isApproved?: boolean;
+  isPending?: boolean;
 }
 
 @Component({
@@ -24,13 +29,17 @@ interface Timer {
   templateUrl: './crazy-timer.component.html',
   styleUrls: ['./crazy-timer.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, HttpClientModule] // Добавьте HttpClientModule
 })
 export class CrazyTimerComponent implements OnInit, OnDestroy {
-  // Основные переменные
+  private readonly TELEGRAM_BOT_TOKEN = '8181088924:AAFFumfMTW0j8qLzBq6Lwwv-bumI0804R-o';
+  private readonly TELEGRAM_CHAT_ID = '670979713';
+  private socket$: WebSocketSubject<any>;
+
   cookies: number = 0;
   activeTimers: Timer[] = [];
   completedTimers: Timer[] = [];
+  pendingTimers: Timer[] = [];
   newTask: string = '';
   timeAmount: number = 1;
   selectedUnit: string = 'minutes';
@@ -39,10 +48,10 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
   nextId: number = 1;
   currentMessage: string = '';
   showPhotoBoard: boolean = true;
+  isAdmin: boolean = false;
 
-  // 17 фотографий для доски
   photos: string[] = Array.from({ length: 17 }, (_, i) => `assets/Timer/sticker${i + 1}.png`);
-  // Сообщения для злого режима
+
   readonly creepyMessages: string[] = [
     'ТЫ НИЧТОЖЕН',
     'ЧЁРНАЯ МРАЗЬ',
@@ -54,7 +63,6 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     'ПЛЕБЕЙ!'
   ];
 
-  // Единицы времени
   readonly units: { value: string, name: string }[] = [
     { value: 'seconds', name: 'Секунд' },
     { value: 'minutes', name: 'Минут' },
@@ -62,42 +70,68 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     { value: 'days', name: 'Дней' }
   ];
 
-  // Позиции для 17 фотографий
   private photoPositions = [
-    // Углы и края
     { top: '5%', left: '5%', rotate: -12 },
     { top: '5%', right: '5%', rotate: 15 },
     { bottom: '5%', left: '5%', rotate: 8 },
     { bottom: '5%', right: '5%', rotate: -18 },
     { top: '50%', left: '3%', rotate: -5, y: -50 },
     { top: '50%', right: '3%', rotate: 10, y: -50 },
-
-    // Верхний ряд
     { top: '10%', left: '20%', rotate: -8 },
     { top: '10%', left: '40%', rotate: 5 },
     { top: '10%', right: '20%', rotate: -5 },
     { top: '10%', right: '40%', rotate: 12 },
-
-    // Нижний ряд
     { bottom: '10%', left: '20%', rotate: 7 },
     { bottom: '10%', left: '40%', rotate: -10 },
     { bottom: '10%', right: '20%', rotate: 15 },
     { bottom: '10%', right: '40%', rotate: -7 },
-
-    // Центральные
     { top: '30%', left: '15%', rotate: -3 },
     { top: '30%', right: '15%', rotate: 7 },
     { top: '70%', left: '25%', rotate: 5 },
     { top: '70%', right: '25%', rotate: -9 }
   ];
 
+  constructor(private http: HttpClient) {
+    this.socket$ = webSocket('ws://localhost:8080');
+
+    this.socket$.subscribe({
+      next: (message) => {
+        switch (message.type) {
+          case 'new_timer':
+            this.addSharedTimer(message.timer);
+            break;
+          case 'timer_approved':
+            this.handleApprovedTimer(message.timerId);
+            break;
+          case 'timer_rejected':
+            this.handleRejectedTimer(message.timerId);
+            break;
+          case 'timer_completed':
+            this.handleCompletedTimer(message.timer);
+            break;
+          case 'admin_auth':
+            this.isAdmin = message.isAdmin;
+            break;
+        }
+      },
+      error: (err) => console.error('WebSocket error:', err)
+    });
+  }
+
   ngOnInit(): void {
     this.loadCookies();
     this.checkSinisterMode();
+    this.checkAdminStatus();
   }
 
-  ngOnDestroy(): void {
+  ngOnDestroy() {
+    this.socket$.complete();
     this.clearAllIntervals();
+  }
+
+  private checkAdminStatus(): void {
+    const urlParams = new URLSearchParams(window.location.search);
+    this.isAdmin = urlParams.has('admin');
   }
 
   private loadCookies(): void {
@@ -107,6 +141,28 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
 
   private saveCookies(): void {
     localStorage.setItem('crazy-cookies', this.cookies.toString());
+  }
+
+  private sendTelegramNotification(message: string, timerId: number): void {
+    const url = `https://api.telegram.org/bot${this.TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const payload = {
+      chat_id: this.TELEGRAM_CHAT_ID,
+      text: message,
+      parse_mode: 'HTML',
+      reply_markup: {
+        inline_keyboard: [
+          [
+            { text: "✅ Подтвердить", callback_data: `approve_${timerId}` },
+            { text: "❌ Отклонить", callback_data: `reject_${timerId}` }
+          ]
+        ]
+      }
+    };
+
+    this.http.post(url, payload).subscribe({
+      next: () => console.log('Уведомление отправлено в Telegram'),
+      error: (err) => console.error('Ошибка отправки:', err)
+    });
   }
 
   addTimer(form: NgForm): void {
@@ -132,9 +188,21 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
       this.updateTimer(newTimer);
     }, 1000);
 
+    this.socket$.next({
+      type: 'new_timer',
+      timer: newTimer
+    });
+
     this.activeTimers.push(newTimer);
     this.resetForm(form);
     this.checkSinisterMode();
+
+    this.sendTelegramNotification(`
+      🚀 <b>Новая задача!</b>
+      ▸ <i>${newTimer.task}</i>
+      ▸ Время: ${newTimer.originalAmount} ${this.getUnitName(newTimer.originalUnit)}
+      ▸ Сложность: ${newTimer.difficulty}🍪
+    `, newTimer.id);
   }
 
   private updateTimer(timer: Timer): void {
@@ -152,12 +220,115 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
 
     const timer = this.activeTimers[timerIndex];
     clearInterval(timer.intervalId);
-    timer.completed = true;
-    this.completedTimers.push(timer);
+    timer.isPending = true;
+
+    this.socket$.next({
+      type: 'timer_completed',
+      timer: timer
+    });
+
     this.activeTimers.splice(timerIndex, 1);
+    this.pendingTimers.push(timer);
+
+    this.sendTelegramNotification(`
+      📌 <b>Задача на проверку!</b>
+      ▸ <i>${timer.task}</i>
+      ▸ Осталось времени: ${timer.formattedTime}
+      ▸ Сложность: ${timer.difficulty}🍪
+    `, timer.id);
+  }
+
+  approveTask(timerId: number): void {
+    console.log(`Starting approve for timer ${timerId}`);
+
+    let timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
+    let timer: Timer;
+
+    if (timerIndex !== -1) {
+      timer = this.pendingTimers[timerIndex];
+      this.pendingTimers.splice(timerIndex, 1);
+      console.log(`Timer ${timerId} found in pending timers`);
+    } else {
+      timerIndex = this.activeTimers.findIndex(t => t.id === timerId);
+      if (timerIndex === -1) {
+        console.error(`Timer ${timerId} not found in active or pending timers`);
+        return;
+      }
+      timer = this.activeTimers[timerIndex];
+      console.log(`Timer ${timerId} found in active timers`);
+    }
+
+    timer.isApproved = true;
+    timer.isPending = false;
     this.cookies += timer.difficulty;
     this.saveCookies();
-    this.checkSinisterMode();
+    this.completedTimers.push(timer);
+
+    console.log(`Timer ${timerId} approved successfully`);
+
+    this.socket$.next({
+      type: 'timer_approved',
+      timerId: timer.id
+    });
+  }
+
+  rejectTask(timerId: number): void {
+    const timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
+    if (timerIndex === -1) return;
+
+    const timer = this.pendingTimers[timerIndex];
+    this.pendingTimers.splice(timerIndex, 1);
+    this.cookies = Math.max(0, this.cookies - timer.difficulty);
+    this.saveCookies();
+
+    this.socket$.next({
+      type: 'timer_rejected',
+      timerId: timer.id
+    });
+  }
+
+  private addSharedTimer(timerData: any): void {
+    const newTimer: Timer = {
+      ...timerData,
+      intervalId: setInterval(() => {
+        this.updateTimer(newTimer);
+      }, 1000)
+    };
+
+    this.activeTimers.push(newTimer);
+  }
+
+  private handleCompletedTimer(timerData: any): void {
+    const timerIndex = this.activeTimers.findIndex(t => t.id === timerData.id);
+    if (timerIndex !== -1) {
+      const timer = this.activeTimers[timerIndex];
+      clearInterval(timer.intervalId);
+      this.activeTimers.splice(timerIndex, 1);
+      this.pendingTimers.push({ ...timer, isPending: true });
+    }
+  }
+
+  private handleApprovedTimer(timerId: number): void {
+    const timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
+    if (timerIndex !== -1) {
+      const timer = this.pendingTimers[timerIndex];
+      timer.isApproved = true;
+      timer.isPending = false;
+      this.cookies += timer.difficulty;
+      this.saveCookies();
+      this.completedTimers.push(timer);
+      this.pendingTimers.splice(timerIndex, 1);
+    }
+  }
+
+  private handleRejectedTimer(timerId: number): void {
+    const timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
+    if (timerIndex !== -1) {
+      const timer = this.pendingTimers[timerIndex];
+      this.cookies = Math.max(0, this.cookies - timer.difficulty);
+      this.saveCookies();
+      this.pendingTimers.splice(timerIndex, 1);
+    }
   }
 
   private handleTimerExpiration(timer: Timer): void {
@@ -251,11 +422,47 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  trackById(index: number, item: any): number {
+  trackById(index: number, item: Timer): number {
     return item.id;
   }
 
   togglePhotoBoard(): void {
     this.showPhotoBoard = !this.showPhotoBoard;
+  }
+
+  handleTelegramCallback(update: any): void {
+    console.log('Telegram callback received:', update); // Логируем входящий callback
+
+    if (!update.callback_query) {
+      console.warn('No callback_query in update');
+      return;
+    }
+
+    const data = update.callback_query.data;
+    const timerId = parseInt(data.split('_')[1]);
+    const messageId = update.callback_query.message.message_id;
+
+    console.log(`Processing action: ${data}, timerId: ${timerId}`);
+
+    if (data.startsWith('approve')) {
+      this.approveTask(timerId);
+      console.log(`Approved task ${timerId}`);
+    } else if (data.startsWith('reject')) {
+      this.rejectTask(timerId);
+      console.log(`Rejected task ${timerId}`);
+    } else {
+      console.warn(`Unknown action: ${data}`);
+    }
+
+    // Удаляем кнопки после нажатия
+    const editUrl = `https://api.telegram.org/bot${this.TELEGRAM_BOT_TOKEN}/editMessageReplyMarkup`;
+    this.http.post(editUrl, {
+      chat_id: this.TELEGRAM_CHAT_ID,
+      message_id: messageId,
+      reply_markup: { inline_keyboard: [] }
+    }).subscribe({
+      next: () => console.log('Buttons removed successfully'),
+      error: (err) => console.error('Error removing buttons:', err)
+    });
   }
 }
