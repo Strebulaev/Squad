@@ -155,7 +155,9 @@
                 Сложность: <span>{{ timer.difficulty }}</span>🍪
               </div>
             </div>
-
+            <div *ngIf="timer.isPending" class="status-badge pending">
+              ⏳ Ожидает проверки ({{ timer.id }})
+            </div>
             <footer class="timer-footer">
               <button *ngIf="!timer.isPending && !timer.isApproved"
                       (click)="completeTimer(timer.id)"
@@ -185,6 +187,9 @@
             <span class="completed-task">{{ timer.task }}</span>
             <span class="completed-cookies">+{{ timer.difficulty }}🍪</span>
           </div>
+        </div>
+        <div *ngIf="timer.isApproved" class="status-badge approved">
+          ✅ Подтверждено ({{ timer.id }})
         </div>
       </section>
     </main>

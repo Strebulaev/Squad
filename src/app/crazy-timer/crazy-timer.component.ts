@@ -118,10 +118,13 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    this.loadCookies();
-    this.checkSinisterMode();
-    this.checkAdminStatus();
+  ngOnInit() {
+    // Проверка статусов каждые 5 секунд
+    setInterval(() => {
+      this.activeTimers.forEach(timer => {
+        if (timer.isPending) this.checkTimerStatus(timer.id);
+      });
+    }, 5000);
   }
 
   ngOnDestroy() {
@@ -271,7 +274,21 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
       timerId: timer.id
     });
   }
+  async checkTimerStatus(timerId: number) {
+    try {
+      // Если используете Vercel KV
+      const response = await fetch(`/api/timer-status?id=${timerId}`);
+      const data = await response.json();
 
+      if (data.status === 'approved') {
+        this.approveTask(timerId);
+      } else if (data.status === 'rejected') {
+        this.rejectTask(timerId);
+      }
+    } catch (error) {
+      console.error('Failed to check timer status:', error);
+    }
+  }
   rejectTask(timerId: number): void {
     const timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
     if (timerIndex === -1) return;
