@@ -2,11 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
-import { interval, Subject, Subscription } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { TelegramService } from '../services/telegram.service';
 
 interface Timer {
   id: number;
@@ -22,15 +19,6 @@ interface Timer {
     transform: string;
     'z-index': number;
   };
-  isApproved?: boolean;
-  isPending?: boolean;
-}
-
-interface SocketMessage {
-  type: 'new_timer' | 'timer_approved' | 'timer_rejected' | 'admin_auth';
-  timer?: Timer;
-  timerId?: number;
-  isAdmin?: boolean;
 }
 
 interface TimeUnit {
@@ -43,17 +31,14 @@ interface TimeUnit {
   templateUrl: './crazy-timer.component.html',
   styleUrls: ['./crazy-timer.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule]
+  imports: [CommonModule, FormsModule]
 })
 export class CrazyTimerComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
-  private socket$: WebSocketSubject<SocketMessage>;
-  private approvalCheckSubscription?: Subscription;
 
   cookies: number = 0;
   activeTimers: Timer[] = [];
   completedTimers: Timer[] = [];
-  pendingTimers: Timer[] = [];
   newTask: string = '';
   timeAmount: number = 1;
   selectedUnit: string = 'minutes';
@@ -62,7 +47,6 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
   nextId: number = 1;
   currentMessage: string = '';
   showPhotoBoard: boolean = true;
-  isAdmin: boolean = false;
 
   photos: string[] = Array.from({ length: 17 }, (_, i) => `assets/Timer/sticker${i + 1}.png`);
 
@@ -105,79 +89,16 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     { top: '70%', right: '25%', rotate: -9 }
   ];
 
-  constructor(
-    private http: HttpClient,
-    private telegram: TelegramService
-  ) {
-    this.socket$ = webSocket<SocketMessage>('ws://localhost:8080');
-    this.setupWebSocket();
-  }
+  constructor() { }
 
   ngOnInit(): void {
     this.loadCookies();
-    this.setupApprovalChecker();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    this.approvalCheckSubscription?.unsubscribe();
     this.clearAllIntervals();
-    this.socket$.complete();
-  }
-
-  private setupWebSocket(): void {
-    this.socket$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: (message) => this.handleSocketMessage(message),
-      error: (err) => console.error('WebSocket error:', err)
-    });
-  }
-
-  private handleSocketMessage(message: SocketMessage): void {
-    switch (message.type) {
-      case 'new_timer':
-        if (message.timer) this.addSharedTimer(message.timer);
-        break;
-      case 'timer_approved':
-        if (message.timerId) this.handleApprovedTimer(message.timerId);
-        break;
-      case 'timer_rejected':
-        if (message.timerId) this.handleRejectedTimer(message.timerId);
-        break;
-      case 'admin_auth':
-        if (message.isAdmin !== undefined) this.isAdmin = message.isAdmin;
-        break;
-    }
-  }
-
-  private setupApprovalChecker(): void {
-    this.approvalCheckSubscription = interval(3000).pipe(
-      takeUntil(this.destroy$)
-    ).subscribe({
-      next: async () => {
-        try {
-          await this.telegram.checkApprovals();
-          this.checkPendingApprovals();
-        } catch (error) {
-          console.error('Error checking approvals:', this.getErrorMessage(error));
-        }
-      },
-      error: (err) => console.error('Approval check error:', err)
-    });
-  }
-
-  private checkPendingApprovals(): void {
-    this.pendingTimers.forEach(timer => {
-      if (this.telegram.isApproved(timer.id)) {
-        this.approveTask(timer.id);
-      }
-    });
-  }
-
-  private getErrorMessage(error: unknown): string {
-    return error instanceof Error ? error.message : String(error);
   }
 
   addTimer(form: NgForm): void {
@@ -186,7 +107,6 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
     const newTimer = this.createNewTimer();
     this.startTimerInterval(newTimer);
     this.addTimerToActiveList(newTimer, form);
-    this.telegram.sendTimerNotification(newTimer, 'new').subscribe();
   }
 
   private createNewTimer(): Timer {
@@ -214,7 +134,6 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
   }
 
   private addTimerToActiveList(timer: Timer, form: NgForm): void {
-    this.socket$.next({ type: 'new_timer', timer });
     this.activeTimers.push(timer);
     this.resetForm(form);
     this.checkSinisterMode();
@@ -226,34 +145,12 @@ export class CrazyTimerComponent implements OnInit, OnDestroy {
 
     const timer = this.activeTimers[timerIndex];
     if (timer.intervalId) clearInterval(timer.intervalId);
-    timer.isPending = true;
 
-    this.activeTimers.splice(timerIndex, 1);
-    this.pendingTimers.push(timer);
-    this.telegram.sendTimerNotification(timer, 'completed').subscribe();
-  }
-
-  approveTask(timerId: number): void {
-    const timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
-    if (timerIndex === -1) return;
-
-    const timer = this.pendingTimers[timerIndex];
-    timer.isApproved = true;
     this.cookies += timer.difficulty;
     this.saveCookies();
 
-    this.pendingTimers.splice(timerIndex, 1);
+    this.activeTimers.splice(timerIndex, 1);
     this.completedTimers.push(timer);
-  }
-
-  rejectTask(timerId: number): void {
-    const timerIndex = this.pendingTimers.findIndex(t => t.id === timerId);
-    if (timerIndex === -1) return;
-
-    const timer = this.pendingTimers[timerIndex];
-    this.cookies = Math.max(0, this.cookies - timer.difficulty);
-    this.saveCookies();
-    this.pendingTimers.splice(timerIndex, 1);
   }
 
   private updateTimer(timer: Timer): void {

@@ -1,182 +1,166 @@
-  <div [class.sinister-theme]="isSinister" class="clown-theme">
-    <!-- Фоновые фотографии -->
-    <div *ngIf="showPhotoBoard" class="photo-board">
-      <div *ngFor="let photo of photos; let i = index" class="photo-pin" [ngStyle]="getPhotoStyle(i)">
-        <img [src]="photo" class="pinned-photo">
-        <div class="pin"></div>
-        <div class="pin-shadow"></div>
-      </div>
+<head>
+  <!-- Yandex.RTB -->
+  <script>window.yaContextCb=window.yaContextCb||[]</script>
+  <script src="https://yandex.ru/ads/system/context.js" async></script>
+</head>
+<body>
+  <script>
+  window.yaContextCb.push(() => {
+    Ya.Context.AdvManager.render({
+      "blockId": "R-A-15188366-1",
+      "type": "floorAd",
+      "platform": "touch"
+    })
+  })
+  </script>
+</body>
+<div [class.sinister-theme]="isSinister" class="clown-theme">
+  <!-- Фоновые фотографии -->
+  <div *ngIf="showPhotoBoard" class="photo-board">
+    <div *ngFor="let photo of photos; let i = index" class="photo-pin" [ngStyle]="getPhotoStyle(i)">
+      <img [src]="photo" class="pinned-photo">
+      <div class="pin"></div>
+      <div class="pin-shadow"></div>
     </div>
-
-    <!-- Основное содержимое -->
-    <div class="content-container">
-      <!-- Заголовок -->
-      <header class="header">
-        <h1 class="crazy-title">
-          <span class="title-emoji">🤡</span>
-          Таймерочек
-          <span class="title-emoji">🎪</span>
-        </h1>
-        <div class="cookie-counter" [class.glowing]="cookies > 0">
-          🍪 × {{ cookies }}
-        </div>
-      </header>
-
-      <!-- Сообщение об ошибке -->
-      <div *ngIf="isSinister" class="sinister-overlay">
-        <div class="sinister-message">
-          <h2 class="sinister-text">{{ currentMessage }}</h2>
-          <div class="sinister-animation">
-            <span>💀</span>
-            <span>🔥</span>
-            <span>👹</span>
-          </div>
-          <p class="sinister-instruction">Выполните задание чтобы выйти из этого кошмара!</p>
-        </div>
-      </div>
-
-      <!-- Форма добавления таймера -->
-      <main class="main-content">
-        <form #timerForm="ngForm" (ngSubmit)="addTimer(timerForm)" class="timer-form">
-          <fieldset class="form-fieldset">
-            <legend class="form-legend">Создать новый таймер</legend>
-
-            <div class="form-group">
-              <label for="taskInput" class="form-label">Задача:</label>
-              <input id="taskInput"
-                     [(ngModel)]="newTask"
-                     name="task"
-                     required
-                     minlength="3"
-                     placeholder="Что нужно сделать?"
-                     class="form-input clown-input">
-            </div>
-
-            <div class="form-group">
-              <label for="timeAmount" class="form-label">Время:</label>
-              <div class="time-input-group">
-                <input id="timeAmount"
-                       type="number"
-                       [(ngModel)]="timeAmount"
-                       name="timeAmount"
-                       required
-                       min="1"
-                       class="form-input number-input clown-input">
-                <select [(ngModel)]="selectedUnit"
-                        name="timeUnit"
-                        class="unit-select clown-select">
-                  <option *ngFor="let unit of units" [value]="unit.value">
-                    {{ unit.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="difficultyRange" class="form-label">
-                Сложность: <span class="difficulty-value">{{ difficulty }}</span>🍪
-              </label>
-              <input id="difficultyRange"
-                     type="range"
-                     [(ngModel)]="difficulty"
-                     name="difficulty"
-                     min="0"
-                     max="10"
-                     step="1"
-                     class="range-input clown-slider"
-                     [style.--track-color]="'hsl(' + (difficulty * 36) + ', 100%, 50%)'">
-            </div>
-
-            <button type="submit"
-                    class="submit-button clown-button"
-                    [disabled]="!timerForm.valid">
-              🎉 ДОБАВИТЬ ЗАДАНИЕ
-            </button>
-          </fieldset>
-        </form>
-
-        <!-- Активные таймеры -->
-        <section class="timers-section" *ngIf="activeTimers.length > 0">
-          <h2 class="section-title">Активные задания ({{ activeTimers.length }})</h2>
-
-          <div class="timers-grid">
-            <article *ngFor="let t of activeTimers" class="timer-card">
-              <header class="timer-header">
-                <h3>{{ t.task }}</h3>
-              </header>
-
-              <div class="timer-body">
-                <div class="time-display">
-                  <span class="time-left">⏳ {{ t.formattedTime }}</span>
-                  <span class="original-time">
-                    ({{ t.originalAmount }} {{ getUnitName(t.originalUnit) }})
-                  </span>
-                </div>
-
-                <div class="difficulty-badge">
-                  Сложность: <span>{{ t.difficulty }}</span>🍪
-                </div>
-              </div>
-
-              <footer class="timer-footer">
-                <button (click)="completeTimer(t.id)"
-                        class="complete-button clown-button">
-                  ✅ Завершить
-                </button>
-              </footer>
-            </article>
-          </div>
-        </section>
-
-        <!-- Задания на проверке -->
-        <section class="pending-section" *ngIf="pendingTimers.length > 0">
-          <h2 class="section-title">На проверке ({{ pendingTimers.length }})</h2>
-
-          <div class="timers-grid">
-            <article *ngFor="let t of pendingTimers" class="timer-card pending-card">
-              <header class="timer-header">
-                <h3>{{ t.task }}</h3>
-                <span class="status-badge pending">⏳ Ожидает подтверждения</span>
-              </header>
-
-              <div class="timer-body">
-                <div class="time-display">
-                  <span class="time-left">⏳ {{ t.formattedTime }}</span>
-                </div>
-                <div class="difficulty-badge">
-                  Сложность: {{ t.difficulty }}🍪
-                </div>
-              </div>
-
-              <footer class="timer-footer" *ngIf="isAdmin">
-                <button (click)="approveTask(t.id)" class="btn-approve">
-                  ✅ Подтвердить
-                </button>
-                <button (click)="rejectTask(t.id)" class="btn-reject">
-                  ❌ Отклонить
-                </button>
-              </footer>
-            </article>
-          </div>
-        </section>
-
-        <!-- Выполненные задания -->
-        <section class="completed-section" *ngIf="completedTimers.length > 0">
-          <h2 class="section-title">Выполненные ({{ completedTimers.length }})</h2>
-
-          <div class="completed-list">
-            <div *ngFor="let t of completedTimers" class="completed-item">
-              <span class="completed-icon">✅</span>
-              <span class="completed-task">{{ t.task }}</span>
-              <span class="completed-cookies">+{{ t.difficulty }}🍪</span>
-            </div>
-          </div>
-        </section>
-      </main>
-    </div>
-
-    <!-- Кнопка переключения доски -->
-    <button (click)="togglePhotoBoard()" class="toggle-board-button clown-button">
-      {{ showPhotoBoard ? 'Спрятать доску' : 'Показать доску' }}
-    </button>
   </div>
+
+  <!-- Основное содержимое -->
+  <div class="content-container">
+    <!-- Заголовок -->
+    <header class="header">
+      <h1 class="crazy-title">
+        <span class="title-emoji">🤡</span>
+        Таймерочек
+        <span class="title-emoji">🎪</span>
+      </h1>
+      <div class="cookie-counter" [class.glowing]="cookies > 0">
+        🍪 × {{ cookies }}
+      </div>
+    </header>
+
+    <!-- Сообщение об ошибке -->
+    <div *ngIf="isSinister" class="sinister-overlay">
+      <div class="sinister-message">
+        <h2 class="sinister-text">{{ currentMessage }}</h2>
+        <div class="sinister-animation">
+          <span>💀</span>
+          <span>🔥</span>
+          <span>👹</span>
+        </div>
+        <p class="sinister-instruction">Выполните задание чтобы выйти из этого кошмара!</p>
+      </div>
+    </div>
+
+    <!-- Форма добавления таймера -->
+    <main class="main-content">
+      <form #timerForm="ngForm" (ngSubmit)="addTimer(timerForm)" class="timer-form">
+        <fieldset class="form-fieldset">
+          <legend class="form-legend">Создать новый таймер</legend>
+
+          <div class="form-group">
+            <label for="taskInput" class="form-label">Задача:</label>
+            <input id="taskInput"
+                   [(ngModel)]="newTask"
+                   name="task"
+                   required
+                   minlength="3"
+                   placeholder="Что нужно сделать?"
+                   class="form-input clown-input">
+          </div>
+
+          <div class="form-group">
+            <label for="timeAmount" class="form-label">Время:</label>
+            <div class="time-input-group">
+              <input id="timeAmount"
+                     type="number"
+                     [(ngModel)]="timeAmount"
+                     name="timeAmount"
+                     required
+                     min="1"
+                     class="form-input number-input clown-input">
+              <select [(ngModel)]="selectedUnit"
+                      name="timeUnit"
+                      class="unit-select clown-select">
+                <option *ngFor="let unit of units" [value]="unit.value">
+                  {{ unit.name }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="difficultyRange" class="form-label">
+              Сложность: <span class="difficulty-value">{{ difficulty }}</span>🍪
+            </label>
+            <input id="difficultyRange"
+                   type="range"
+                   [(ngModel)]="difficulty"
+                   name="difficulty"
+                   min="0"
+                   max="10"
+                   step="1"
+                   class="range-input clown-slider"
+                   [style.--track-color]="'hsl(' + (difficulty * 36) + ', 100%, 50%)'">
+          </div>
+
+          <button type="submit"
+                  class="submit-button clown-button"
+                  [disabled]="!timerForm.valid">
+            🎉 ДОБАВИТЬ ЗАДАНИЕ
+          </button>
+        </fieldset>
+      </form>
+
+      <!-- Активные таймеры -->
+      <section class="timers-section" *ngIf="activeTimers.length > 0">
+        <h2 class="section-title">Активные задания ({{ activeTimers.length }})</h2>
+
+        <div class="timers-grid">
+          <article *ngFor="let t of activeTimers" class="timer-card">
+            <header class="timer-header">
+              <h3>{{ t.task }}</h3>
+            </header>
+
+            <div class="timer-body">
+              <div class="time-display">
+                <span class="time-left">⏳ {{ t.formattedTime }}</span>
+                <span class="original-time">
+                  ({{ t.originalAmount }} {{ getUnitName(t.originalUnit) }})
+                </span>
+              </div>
+
+              <div class="difficulty-badge">
+                Сложность: <span>{{ t.difficulty }}</span>🍪
+              </div>
+            </div>
+
+            <footer class="timer-footer">
+              <button (click)="completeTimer(t.id)"
+                      class="complete-button clown-button">
+                ✅ Завершить
+              </button>
+            </footer>
+          </article>
+        </div>
+      </section>
+
+      <!-- Выполненные задания -->
+      <section class="completed-section" *ngIf="completedTimers.length > 0">
+        <h2 class="section-title">Выполненные ({{ completedTimers.length }})</h2>
+
+        <div class="completed-list">
+          <div *ngFor="let t of completedTimers" class="completed-item">
+            <span class="completed-icon">✅</span>
+            <span class="completed-task">{{ t.task }}</span>
+            <span class="completed-cookies">+{{ t.difficulty }}🍪</span>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Кнопка переключения доски -->
+  <button (click)="togglePhotoBoard()" class="toggle-board-button clown-button">
+    {{ showPhotoBoard ? 'Спрятать доску' : 'Показать доску' }}
+  </button>
+</div>
