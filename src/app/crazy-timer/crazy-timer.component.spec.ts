@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { CrazyTimerComponent } from './crazy-timer.component';
+
 
 describe('CrazyTimerComponent', () => {
   let component: CrazyTimerComponent;
